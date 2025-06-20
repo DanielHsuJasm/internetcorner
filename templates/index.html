@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>回憶膠卷</title>
+    <title>回憶膠卷 - 星空記憶</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>回憶膠卷</h1>
+        <h1>✨ 回憶膠卷 ✨</h1>
+        <p style="margin-top: 0.5rem; font-size: 1.1rem; opacity: 0.9;">珍藏每一刻星空下的美好</p>
     </header>
 
     <main>
@@ -22,49 +26,109 @@
                 </ul>
               {% endif %}
             {% endwith %}
+            
+            <div style="margin-bottom: 1rem;">
+                <h2 style="color: rgba(255,255,255,0.9); margin-bottom: 1rem; font-size: 1.3rem;">
+                    📸 上傳你的回憶
+                </h2>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">
+                    讓每張照片都成為星空中最亮的星
+                </p>
+            </div>
+            
             <form action="{{ url_for('upload.upload') }}" method="post" enctype="multipart/form-data">
-                <input type="file" name="photos" accept="image/*" multiple>
-                <button type="submit">上傳照片</button>
+                <input type="file" name="photos" accept="image/*" multiple 
+                       placeholder="選擇你的回憶照片..."
+                       title="支援 PNG, JPG, JPEG, GIF 格式">
+                <button type="submit">
+                    <span>🌟 上傳回憶</span>
+                </button>
             </form>
         </section>
 
         <section class="preview-section">
             {% if images|length == 0 %}
-                <p class="no-photo">目前尚無回憶，請上傳回憶</p>
+                <div class="no-photo">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🌌</div>
+                    <p>星空正在等待你的第一段回憶</p>
+                    <p style="font-size: 1rem; margin-top: 0.5rem; opacity: 0.8;">
+                        上傳照片開始你的回憶之旅
+                    </p>
+                </div>
             {% elif images|length == 1 %}
                 <div class="single-photo">
-                    <img src="{{ images[0].url }}" alt="回憶">
-                    <form action="{{ url_for('delete.delete', photo_id=images[0].id) }}" method="post" class="delete-form">
-                        <button type="submit">×</button>
+                    <img src="{{ images[0].url }}" alt="珍貴回憶" class="preview-img">
+                    <form action="{{ url_for('delete.delete', photo_id=images[0].id) }}" method="post" class="delete-form"
+                          onsubmit="return confirm('確定要刪除這個回憶嗎？');">
+                        <button type="submit" title="刪除回憶">×</button>
                     </form>
                 </div>
             {% else %}
+                <div class="film-header" style="text-align: center; margin-bottom: 2rem;">
+                    <h2 style="color: rgba(255,255,255,0.9); font-size: 1.5rem; margin-bottom: 0.5rem;">
+                        🎞️ 回憶膠卷
+                    </h2>
+                    <p style="color: rgba(255,255,255,0.7);">
+                        {{ images|length }} 個珍貴時刻 | 點擊照片放大觀看
+                    </p>
+                </div>
+                
                 <div class="film-strip-container">
                     <div class="film-strip">
                         {% for img in images %}
                             <div class="frame">
-                                <img class="preview-img" src="{{ img.url }}" alt="回憶">
-                                <form action="{{ url_for('delete.delete', photo_id=img.id) }}" method="post" class="delete-form">
-                                    <button type="submit">×</button>
+                                <img class="preview-img" 
+                                     src="{{ img.url }}" 
+                                     alt="回憶 {{ loop.index }}"
+                                     title="上傳時間: {{ img.uploaded_at.strftime('%Y-%m-%d %H:%M') if img.uploaded_at }}">
+                                <form action="{{ url_for('delete.delete', photo_id=img.id) }}" 
+                                      method="post" 
+                                      class="delete-form"
+                                      onsubmit="return confirm('確定要刪除這個回憶嗎？');">
+                                    <button type="submit" title="刪除回憶">×</button>
                                 </form>
                             </div>
                         {% endfor %}
+                        <!-- 複製一遍實現無縫循環 -->
                         {% for img in images %}
                             <div class="frame">
-                                <img class="preview-img" src="{{ img.url }}" alt="回憶">
-                                <form action="{{ url_for('delete.delete', photo_id=img.id) }}" method="post" class="delete-form">
-                                    <button type="submit">×</button>
+                                <img class="preview-img" 
+                                     src="{{ img.url }}" 
+                                     alt="回憶 {{ loop.index }}"
+                                     title="上傳時間: {{ img.uploaded_at.strftime('%Y-%m-%d %H:%M') if img.uploaded_at }}">
+                                <form action="{{ url_for('delete.delete', photo_id=img.id) }}" 
+                                      method="post" 
+                                      class="delete-form"
+                                      onsubmit="return confirm('確定要刪除這個回憶嗎？');">
+                                    <button type="submit" title="刪除回憶">×</button>
                                 </form>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
+                
+                <div class="film-footer" style="text-align: center; margin-top: 2rem;">
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                        💫 懸停膠卷可暫停滾動 | 🔍 點擊照片可全螢幕觀看
+                    </p>
+                </div>
             {% endif %}
         </section>
     </main>
 
-    <div id="overlay" class="overlay">
-        <img id="overlay-img" src="" alt="">
+    <!-- 全螢幕預覽覆蓋層 -->
+    <div id="overlay" class="overlay" title="點擊任意處關閉">
+        <img id="overlay-img" src="" alt="全螢幕預覽">
+    </div>
+
+    <!-- 載入指示器 -->
+    <div id="loading" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                             background: rgba(0,0,0,0.8); color: white; padding: 1rem 2rem; 
+                             border-radius: 10px; z-index: 9999;">
+        <div style="text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⭐</div>
+            <p>正在上傳你的回憶...</p>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
