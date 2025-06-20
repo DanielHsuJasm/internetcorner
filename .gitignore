@@ -38,4 +38,4 @@ dist/
 build/
 *.egg-info/
 
-.gitignore
+!.gitignore
