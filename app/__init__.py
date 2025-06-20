@@ -9,6 +9,8 @@ def create_app(config_name=None):
     # 本地開發讀 .env
     load_dotenv()
 
+    print("Using S3 bucket:", os.getenv("S3_BUCKET"))
+
     app = Flask(__name__, 
                 static_folder=os.path.join(os.getcwd(), 'static'),
                 template_folder=os.path.join(os.getcwd(), 'templates'))
