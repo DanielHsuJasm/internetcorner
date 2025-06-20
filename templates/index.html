@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回憶膠卷</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>回憶膠卷</h1>
+    </header>
+
+    <main>
+        <section class="upload-section">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <ul class="flash-messages">
+                  {% for category, msg in messages %}
+                    <li class="flash {{ category }}">{{ msg }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+            <form action="{{ url_for('upload.upload') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="photos" accept="image/*" multiple>
+                <button type="submit">上傳照片</button>
+            </form>
+        </section>
+
+        <section class="preview-section">
+            {% if images|length == 0 %}
+                <p class="no-photo">目前尚無回憶，請上傳回憶</p>
+            {% elif images|length == 1 %}
+                <div class="single-photo">
+                    <img src="{{ images[0].url }}" alt="回憶">
+                    <form action="{{ url_for('delete.delete', photo_id=images[0].id) }}" method="post" class="delete-form">
+                        <button type="submit">×</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="film-strip-container">
+                    <div class="film-strip">
+                        {% for img in images %}
+                            <div class="frame">
+                                <img class="preview-img" src="{{ img.url }}" alt="回憶">
+                                <form action="{{ url_for('delete.delete', photo_id=img.id) }}" method="post" class="delete-form">
+                                    <button type="submit">×</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                        {% for img in images %}
+                            <div class="frame">
+                                <img class="preview-img" src="{{ img.url }}" alt="回憶">
+                                <form action="{{ url_for('delete.delete', photo_id=img.id) }}" method="post" class="delete-form">
+                                    <button type="submit">×</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <div id="overlay" class="overlay">
+        <img id="overlay-img" src="" alt="">
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

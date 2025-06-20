@@ -1,0 +1,39 @@
+# Python 快取
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+venv/
+env/
+
+# 環境變數檔
+.env
+
+# IDE 設定
+.vscode/
+.idea/
+
+# 日誌
+logs/
+*.log
+
+# 本地 DB（SQLite 測試用）
+*.db
+dev.db
+
+# macOS
+.DS_Store
+
+# pytest / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+
+# 本地暫存上傳（如 static/uploads/）
+static/uploads/
+
+# build/artifacts
+dist/
+build/
+*.egg-info/
