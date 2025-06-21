@@ -7,7 +7,7 @@ bp = Blueprint('delete', __name__, url_prefix='/delete')
 def delete(photo_id):
     success = delete_photo(photo_id)
     if success:
-        flash('圖片已刪除', 'success')
+        pass
     else:
         flash('找不到該圖片', 'error')
     return redirect(url_for('view.index'))

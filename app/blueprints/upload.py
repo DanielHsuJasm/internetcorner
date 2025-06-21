@@ -13,7 +13,6 @@ def upload():
         if file and file.filename:
             try:
                 save_photo(file)
-                flash(f"上傳成功: {file.filename}", 'success')
             except ValueError as ve:
                 flash(str(ve), 'warning')
             except Exception:
