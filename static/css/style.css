@@ -36,6 +36,10 @@ body {
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
+    /* 優化渲染性能 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
 }
 
 /* Canvas 星空背景 */
@@ -47,12 +51,14 @@ body {
     height: 100%;
     z-index: var(--star-canvas-z);
     pointer-events: none;
+    /* 優化 Canvas 性能 */
+    will-change: auto;
 }
 
-/* Header */
+/* Header - 簡化特效 */
 header {
-    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,17,34,0.8), rgba(0,0,0,0.7));
-    backdrop-filter: blur(15px);
+    background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,17,34,0.9), rgba(0,0,0,0.8));
+    /* 移除 backdrop-filter 提升性能 */
     border: 1px solid rgba(255,255,255,0.1);
     padding: 2rem 1rem;
     text-align: center;
@@ -60,6 +66,7 @@ header {
     position: relative;
     z-index: 1;
 }
+
 header::after {
     content: '';
     position: absolute;
@@ -70,34 +77,36 @@ header::after {
     background: linear-gradient(90deg, transparent, var(--accent-gold), var(--accent-white), var(--accent-silver), transparent);
     animation: shimmer 3s ease-in-out infinite;
 }
+
 @keyframes shimmer {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
 }
+
 header h1 { 
     color: white; 
     font-size: 2.5rem; 
     text-shadow: 
         0 0 10px rgba(255,255,255,0.5),
-        0 0 20px rgba(255,215,0,0.3),
-        2px 2px 4px rgba(0,0,0,0.8);
+        0 0 20px rgba(255,215,0,0.3);
     letter-spacing: 2px;
-    animation: glow 2s ease-in-out infinite alternate;
+    /* 簡化動畫 */
+    animation: glow 4s ease-in-out infinite alternate;
 }
+
 @keyframes glow {
     from { 
         text-shadow: 
             0 0 10px rgba(255,255,255,0.5),
-            0 0 20px rgba(255,215,0,0.3),
-            2px 2px 4px rgba(0,0,0,0.8);
+            0 0 20px rgba(255,215,0,0.3);
     }
     to { 
         text-shadow: 
             0 0 15px rgba(255,255,255,0.8),
-            0 0 25px rgba(255,215,0,0.5),
-            2px 2px 4px rgba(0,0,0,0.8);
+            0 0 25px rgba(255,215,0,0.5);
     }
 }
+
 .header-subtitle {
     margin-top: 0.5rem;
     font-size: 1.1rem;
@@ -122,45 +131,48 @@ main {
     max-width: 600px;
     margin: 0 auto 1rem;
 }
+
 .flash { 
     padding: 0.8rem 1.5rem; 
     border-radius: 10px; 
     margin-bottom: 0.8rem;
-    backdrop-filter: blur(10px);
+    /* 移除 backdrop-filter */
     border: 1px solid rgba(255,255,255,0.2);
     position: relative;
     z-index: 2;
 }
+
 .flash.error { background-color: var(--flash-error); color: #a00; }
 .flash.warning { background-color: var(--flash-warning); color: #a60; }
 .flash.success { background-color: var(--flash-success); color: #060; }
 
-/* Upload section */
+/* Upload section - 簡化特效 */
 .upload-section { 
     text-align: center;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(15px);
+    background: rgba(0,0,0,0.7);
+    /* 移除 backdrop-filter */
     padding: 2rem;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 
-        0 8px 32px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     max-width: 600px;
     width: 100%;
     position: relative;
     z-index: 1;
 }
+
 .upload-intro h2 {
     color: rgba(255,255,255,0.9);
     margin-bottom: 0.5rem;
     font-size: 1.3rem;
 }
+
 .upload-intro p {
     color: rgba(255,255,255,0.7);
     margin-bottom: 1rem;
     font-size: 1rem;
 }
+
 #file-input {
     display: block;
     margin: 0.5rem auto 1rem;
@@ -171,19 +183,21 @@ main {
     color: var(--text-color);
     width: 100%;
     max-width: 100%;
-    backdrop-filter: blur(5px);
     cursor: pointer;
 }
+
 #file-input:hover {
     border-color: var(--accent-white);
     background: rgba(0,0,0,0.6);
 }
+
 .file-label {
     display: inline-block;
     font-size: 0.9rem;
     color: rgba(255,255,255,0.8);
     margin-bottom: 0.5rem;
 }
+
 .upload-button {
     padding: 0.8rem 2rem;
     background: linear-gradient(135deg, var(--accent-gold), var(--accent-white), var(--accent-silver));
@@ -193,39 +207,38 @@ main {
     border-radius: 25px;
     font-size: 1.1rem;
     font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 
-        0 4px 15px rgba(0,0,0,0.3),
-        0 0 20px rgba(255,215,0,0.2);
-}
-.upload-button:hover { 
-    transform: translateY(-2px);
-    box-shadow: 
-        0 6px 20px rgba(0,0,0,0.4),
-        0 0 30px rgba(255,215,0,0.4);
-    background: linear-gradient(135deg, var(--accent-white), var(--accent-gold), var(--accent-white));
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    /* 優化硬體加速 */
+    will-change: transform;
 }
 
-/* No photo */
+.upload-button:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* No photo - 簡化 */
 .no-photo { 
     text-align: center; 
     font-size: 1.4rem; 
     color: rgba(255,255,255,0.8);
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(15px);
+    background: rgba(0,0,0,0.7);
     padding: 3rem 2rem;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     max-width: 90%;
     margin: 0 auto;
     position: relative;
     z-index: 1;
 }
+
 .no-photo-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
 }
+
 .no-photo-sub {
     font-size: 1rem;
     margin-top: 0.5rem;
@@ -241,21 +254,19 @@ main {
     margin: 0 auto;
     z-index: 1;
 }
+
 .single-photo img {
     max-width: 100%; 
     max-height: 60vh; 
     cursor: pointer; 
     border-radius: 15px;
-    box-shadow: 
-        0 10px 30px rgba(0,0,0,0.7),
-        0 0 20px rgba(255,255,255,0.1);
-    transition: transform 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
+    will-change: transform;
 }
+
 .single-photo img:hover { 
-    transform: scale(1.05);
-    box-shadow: 
-        0 15px 40px rgba(0,0,0,0.8),
-        0 0 30px rgba(255,215,0,0.3);
+    transform: scale(1.02);
 }
 
 /* 預覽區域整體置中 */
@@ -270,7 +281,7 @@ main {
     padding: 0;
 }
 
-/* 膠卷標題完全置中 */
+/* 膠卷標題 */
 .film-header {
     text-align: center;
     margin: 0 auto 2rem auto;
@@ -284,9 +295,7 @@ main {
     color: rgba(255,255,255,0.9);
     font-size: 1.8rem;
     margin: 0 0 0.5rem 0;
-    text-shadow: 
-        0 0 10px rgba(255,255,255,0.3),
-        0 0 20px rgba(255,215,0,0.2);
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
 .film-header p {
@@ -295,20 +304,15 @@ main {
     margin: 0;
 }
 
-/* Film strip 容器 - 強制置中 */
+/* Film strip 容器 - 大幅優化性能 */
 .film-strip-container {
-    /* 基本尺寸和位置 */
     width: 100%;
     max-width: 800px;
     height: 70vh;
     position: relative;
+    margin: 0 auto;
     
-    /* 強制置中 */
-    margin: 0 auto !important;
-    left: 50% !important;
-    transform: translateX(-50%) perspective(1000px) rotateX(5deg) !important;
-    
-    /* 視覺樣式 */
+    /* 簡化背景 */
     background: linear-gradient(90deg, 
         #0a0a0a 0%, 
         #1a1a2e 10%, 
@@ -317,17 +321,24 @@ main {
         #0a0a0a 100%);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 
-        0 20px 40px rgba(0,0,0,0.8),
-        inset 0 0 0 8px #1a1a1a,
-        inset 0 0 0 12px #2c2c54,
-        0 0 30px rgba(255,255,255,0.1);
     
+    /* 簡化陰影 */
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.6),
+        inset 0 0 0 8px #1a1a1a,
+        inset 0 0 0 12px #2c2c54;
+    
+    /* 移除 3D 效果提升性能 */
+    transform: none;
     z-index: 1;
     display: block;
+    
+    /* 優化渲染 */
+    contain: layout style paint;
+    will-change: auto;
 }
 
-/* 膠卷孔洞對稱 */
+/* 膠卷孔洞 - 簡化 */
 .film-strip-container::before,
 .film-strip-container::after {
     content: '';
@@ -353,96 +364,84 @@ main {
     right: 15px;
 }
 
-/* 懸停暫停動畫時保持置中 */
-.film-strip-container:hover .film-strip { 
-    animation-play-state: paused; 
-}
-
-/* 膠卷內容絕對置中 */
+/* 膠卷內容 - 優化動畫性能 */
 .film-strip { 
-    /* 佈局 */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    
-    /* 尺寸和位置 */
     width: 100%;
     height: auto;
     position: relative;
-    left: 0 !important;
-    right: 0 !important;
-    
-    /* 內邊距 */
     padding: 30px 60px 0 60px;
     margin: 0 auto;
     gap: 20px;
     box-sizing: border-box;
     
-    /* 動畫 */
-    animation: scroll-up 25s linear infinite;
+    /* 優化動畫 - 使用 transform 而非改變 position */
+    animation: scroll-up-optimized 25s linear infinite;
+    transform: translateZ(0); /* 強制硬體加速 */
+    will-change: transform;
 }
 
-/* 框架完全置中 */
+/* 懸停暫停 */
+.film-strip-container:hover .film-strip { 
+    animation-play-state: paused; 
+}
+
+/* 優化的動畫 */
+@keyframes scroll-up-optimized {
+    0% { 
+        transform: translateZ(0) translateY(0);
+    }
+    100% { 
+        transform: translateZ(0) translateY(-50%);
+    }
+}
+
+/* 框架 - 簡化特效 */
 .frame {
-    /* 基本樣式 */
     flex: 0 0 auto;
     position: relative;
-    
-    /* 完美置中 */
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    
-    /* 視覺樣式 */
     background: rgba(0,0,0,0.4);
     border-radius: 10px;
     padding: 15px;
-    backdrop-filter: blur(5px);
     border: 2px solid rgba(255,255,255,0.1);
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease, background-color 0.2s ease;
     box-sizing: border-box;
-    
-    /* 確保內容不會偏移 */
     text-align: center;
+    will-change: transform;
 }
 
 .frame:hover {
     background: rgba(0,0,0,0.6);
     transform: scale(1.02);
     border-color: var(--accent-gold);
-    box-shadow: 0 0 20px rgba(255,215,0,0.3);
 }
 
-/* 圖片絕對置中 */
+/* 圖片優化 */
 .frame img {
-    /* 尺寸 */
     width: 100%;
     max-width: 300px;
     height: 200px;
-    
-    /* 置中 */
     display: block;
     margin: 0 auto;
-    
-    /* 樣式 */
     object-fit: cover;
     border-radius: 8px;
-    box-shadow: 
-        0 5px 15px rgba(0,0,0,0.5),
-        0 0 10px rgba(255,255,255,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     cursor: pointer; 
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
+    will-change: transform;
 }
 
 .frame img:hover { 
     transform: scale(1.05);
-    box-shadow: 
-        0 8px 25px rgba(0,0,0,0.7),
-        0 0 20px rgba(255,215,0,0.2);
 }
 
 .delete-form { 
@@ -451,6 +450,7 @@ main {
     right: 10px;
     z-index: 5;
 }
+
 .delete-form button {
     background: linear-gradient(135deg, #ff4757, #ff3838);
     border: none; 
@@ -461,21 +461,16 @@ main {
     cursor: pointer;
     font-size: 18px;
     font-weight: bold;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
     box-shadow: 0 2px 10px rgba(255,0,0,0.4);
+    will-change: transform;
 }
+
 .delete-form button:hover { 
-    background: linear-gradient(135deg, #ff3838, #ff4757);
     transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(255,0,0,0.6);
 }
 
-@keyframes scroll-up {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-50%); }
-}
-
-/* Overlay */
+/* Overlay - 簡化 */
 .overlay {
     position: fixed; 
     top: 0; 
@@ -483,25 +478,25 @@ main {
     width: 100%; 
     height: 100%;
     background: rgba(0,0,0,0.95);
-    backdrop-filter: blur(10px);
     display: none; 
     align-items: center; 
     justify-content: center;
     z-index: 1000;
 }
+
 .overlay.show { 
     display: flex; 
 }
+
 .overlay img {
     max-width: 90%; 
     max-height: 90%; 
     border-radius: 15px;
-    box-shadow: 
-        0 10px 40px rgba(0,0,0,0.9),
-        0 0 50px rgba(255,255,255,0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     transition: transform 0.3s ease; 
     transform: scale(0.8);
 }
+
 .overlay.show img { 
     transform: scale(1); 
 }
@@ -521,27 +516,31 @@ main {
     opacity: 0;
     transition: opacity 0.3s ease;
 }
+
 .loading-indicator.show {
     display: block;
     opacity: 1;
 }
+
 .loading-content {
     text-align: center;
 }
+
 .loading-icon {
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
-/* 信封樣式 */
+/* 信封樣式 - 保持原有功能但優化性能 */
 .envelope-container {
     position: fixed;
     bottom: 30px;
     right: 30px;
     z-index: 100;
     cursor: pointer;
-    transition: all var(--envelope-anim-duration) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all var(--envelope-anim-duration) ease;
     transform-origin: center;
+    will-change: transform;
 }
 
 .envelope-container.fullscreen {
@@ -554,7 +553,7 @@ main {
     height: 100vh;
     z-index: 1001;
     background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -567,11 +566,10 @@ main {
     background: linear-gradient(135deg, #f4e4bc, #e8d5a3);
     border-radius: 8px;
     position: relative;
-    box-shadow: 
-        0 8px 25px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(255, 215, 0, 0.2);
-    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
     transform: perspective(1000px) rotateX(5deg) rotateY(-5deg);
+    will-change: transform;
 }
 
 .envelope-container.fullscreen .envelope {
@@ -610,9 +608,7 @@ main {
 
 .envelope:hover {
     transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.1);
-    box-shadow: 
-        0 12px 35px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 
 .letter-content {
@@ -621,12 +617,10 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     padding: 40px;
     border-radius: 15px;
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     max-width: 600px;
     width: 90%;
     max-height: 80vh;
@@ -723,18 +717,25 @@ main {
     visibility: visible;
 }
 
-/* Responsive */
+/* 響應式 - 大幅簡化移動端特效 */
 @media (max-width: 768px) {
     header h1 { 
         font-size: 2rem; 
+        /* 移除動畫提升性能 */
+        animation: none;
+        text-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
+    
     main {
         padding: 1rem;
     }
+    
     .film-strip-container { 
         max-width: 95%;
         height: 60vh;
-        transform: translateX(-50%) perspective(800px) rotateX(3deg) !important;
+        /* 移除 3D 效果 */
+        transform: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
     }
     
     .film-strip {
@@ -745,6 +746,7 @@ main {
         height: 150px;
         max-width: 250px;
     }
+    
     .upload-section {
         padding: 1.5rem;
     }
@@ -758,6 +760,8 @@ main {
     .envelope {
         width: 60px;
         height: 45px;
+        /* 簡化 3D 效果 */
+        transform: none;
     }
     
     .envelope::after {
@@ -767,6 +771,7 @@ main {
     .envelope-container.fullscreen .envelope {
         width: 300px;
         height: 225px;
+        transform: none;
     }
     
     .envelope-container.fullscreen .envelope::after {
@@ -777,6 +782,7 @@ main {
         padding: 25px;
         width: 95%;
         max-height: 85vh;
+        backdrop-filter: none;
     }
     
     .letter-content h3 {
@@ -786,24 +792,19 @@ main {
     .letter-content p {
         font-size: 1rem;
     }
-    
-    /* 停用重度特效 */
-    body {
-        /* background gradient 保留 */
-    }
-    header, .upload-section, .flash, .film-strip-container, .no-photo {
-        backdrop-filter: none !important;
-    }
 }
 
 @media (max-width: 480px) {
     header h1 { 
         font-size: 1.5rem; 
+        animation: none;
     }
+    
     .film-strip-container { 
         max-width: 98%;
         height: 50vh;
-        transform: translateX(-50%) !important;
+        transform: none;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.4);
     }
     
     .film-strip {
@@ -818,6 +819,7 @@ main {
         height: 120px;
         max-width: 200px;
     }
+    
     .upload-section {
         padding: 1rem;
     }
@@ -826,6 +828,7 @@ main {
     .envelope {
         width: 50px;
         height: 37px;
+        transform: none;
     }
     
     .envelope::after {
@@ -835,6 +838,7 @@ main {
     .envelope-container.fullscreen .envelope {
         width: 250px;
         height: 188px;
+        transform: none;
     }
     
     .envelope-container.fullscreen .envelope::after {
@@ -843,36 +847,33 @@ main {
     
     .letter-content {
         padding: 20px;
-    }
-    
-    header, .upload-section, .flash, .film-strip-container, .no-photo {
-        backdrop-filter: none !important;
+        backdrop-filter: none;
     }
 }
 
-/* Focus 樣式強化 */
+/* Focus 樣式 */
 button:focus, input[type="file"]:focus, .upload-button:focus, .envelope-container:focus {
     outline: 2px solid var(--accent-gold);
     outline-offset: 2px;
 }
 
-/* 可視化測試時保留 body overflow-x:hidden，避免水平滾動 */
+/* 性能優化：減少重繪 */
+.frame, .envelope, .upload-button, .single-photo img {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
 
-/* ====== 緊急膠卷置中修復 - 添加到 CSS 最底部 ====== */
-
-/* 強制重置膠卷容器定位 */
+/* 強制置中修復 */
 .film-strip-container {
     position: relative !important;
     left: auto !important;
     right: auto !important;
     margin: 0 auto !important;
-    transform: perspective(1000px) rotateX(5deg) !important;
     width: 100% !important;
     max-width: 800px !important;
     display: block !important;
 }
 
-/* 強制重置膠卷內容 */
 .film-strip {
     position: relative !important;
     left: auto !important;
@@ -885,7 +886,6 @@ button:focus, input[type="file"]:focus, .upload-button:focus, .envelope-containe
     justify-content: flex-start !important;
 }
 
-/* 確保預覽區域置中 */
 .preview-section {
     display: flex !important;
     flex-direction: column !important;
@@ -895,21 +895,340 @@ button:focus, input[type="file"]:focus, .upload-button:focus, .envelope-containe
     margin: 0 auto !important;
 }
 
-/* 響應式強制置中 */
+
+/* 優化的信封樣式 - 添加到 CSS 最底部覆蓋原有樣式 */
+
+/* 信封容器優化 */
+.envelope-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 100;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center;
+    
+    /* 性能優化 */
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.envelope-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.95);
+    /* 移除 backdrop-filter 以提升性能 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+}
+
+/* 信封本體優化 */
+.envelope {
+    width: 80px;
+    height: 60px;
+    background: linear-gradient(135deg, #f4e4bc, #e8d5a3);
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    transform: perspective(1000px) rotateX(5deg) rotateY(-5deg);
+    
+    /* 性能優化 */
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.envelope-container.fullscreen .envelope {
+    width: 400px;
+    height: 300px;
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+
+.envelope::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 49%, #d4af37 49%, #d4af37 51%, transparent 51%);
+    border-radius: 8px;
+    z-index: 2;
+}
+
+.envelope::after {
+    content: '💌';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+.envelope-container.fullscreen .envelope::after {
+    font-size: 60px;
+    opacity: 0.7;
+}
+
+.envelope:hover {
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.1);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* 信件內容優化 */
+.letter-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.98);
+    /* 移除 backdrop-filter，改用更不透明的背景 */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-family: 'Noto Sans TC', serif;
+    color: #333;
+    line-height: 1.8;
+    text-align: left;
+    
+    /* 性能優化 */
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    
+    /* 優化滾動性能 */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.3) transparent;
+}
+
+.letter-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.letter-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.letter-content::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.3);
+    border-radius: 3px;
+}
+
+.letter-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.5);
+}
+
+.letter-content.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.letter-content h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 10px;
+}
+
+.letter-content p {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.letter-content .signature {
+    text-align: right;
+    margin-top: 30px;
+    font-style: italic;
+    color: #7f8c8d;
+}
+
+.close-hint {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    animation: pulse-hint 2s infinite;
+}
+
+@keyframes pulse-hint {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* 工具提示優化 */
+.envelope-container:not(.fullscreen)::before {
+    content: '點擊查看信件 💌';
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    margin-bottom: 10px;
+    z-index: 110;
+    pointer-events: none;
+}
+
+.envelope-container:not(.fullscreen):hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 小箭頭優化 */
+.envelope-container:not(.fullscreen)::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 20px;
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    margin-bottom: 4px;
+    pointer-events: none;
+}
+
+.envelope-container:not(.fullscreen):hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 響應式優化 */
 @media (max-width: 768px) {
-    .film-strip-container {
-        transform: perspective(800px) rotateX(3deg) !important;
-        margin: 0 auto !important;
-        left: auto !important;
-        right: auto !important;
+    .envelope-container {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .envelope {
+        width: 60px;
+        height: 45px;
+        /* 移動端移除 3D 效果 */
+        transform: none;
+    }
+    
+    .envelope:hover {
+        transform: scale(1.05);
+    }
+    
+    .envelope::after {
+        font-size: 18px;
+    }
+    
+    .envelope-container.fullscreen .envelope {
+        width: 300px;
+        height: 225px;
+        transform: none;
+    }
+    
+    .envelope-container.fullscreen .envelope::after {
+        font-size: 45px;
+    }
+    
+    .letter-content {
+        padding: 25px;
+        width: 95%;
+        max-height: 85vh;
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .letter-content h3 {
+        font-size: 1.3rem;
+    }
+    
+    .letter-content p {
+        font-size: 1rem;
     }
 }
 
 @media (max-width: 480px) {
-    .film-strip-container {
-        transform: none !important;
-        margin: 0 auto !important;
-        left: auto !important;
-        right: auto !important;
+    .envelope {
+        width: 50px;
+        height: 37px;
+        transform: none;
     }
+    
+    .envelope:hover {
+        transform: scale(1.03);
+    }
+    
+    .envelope::after {
+        font-size: 16px;
+    }
+    
+    .envelope-container.fullscreen .envelope {
+        width: 250px;
+        height: 188px;
+        transform: none;
+    }
+    
+    .envelope-container.fullscreen .envelope::after {
+        font-size: 40px;
+    }
+    
+    .letter-content {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.98);
+    }
+}
+
+/* 性能模式專用樣式 */
+.performance-mode .envelope-container {
+    transition: all 0.2s ease !important;
+}
+
+.performance-mode .envelope {
+    transition: all 0.2s ease !important;
+    transform: none !important;
+}
+
+.performance-mode .envelope:hover {
+    transform: scale(1.05) !important;
+}
+
+.performance-mode .letter-content {
+    transition: opacity 0.2s ease !important;
+    background: rgba(255, 255, 255, 1) !important;
+}
+
+/* 動畫暫停時的樣式 */
+.letter-opening .envelope-container,
+.letter-opening .envelope,
+.letter-opening .letter-content {
+    pointer-events: none;
+}
+
+/* Focus 樣式優化 */
+.envelope-container:focus {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
 }
