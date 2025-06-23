@@ -41,7 +41,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             color="#4ECDC4", 
             route="birthday.index",
             description="每年生日",
-            enabled=True,
+            enabled=False,
             date="xxxx.06.26"
         ),
         BookmarkConfig(

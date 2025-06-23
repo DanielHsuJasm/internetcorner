@@ -1,9 +1,9 @@
 :root {
     /* 保持原有變數 */
-    --book-color: #4A90A4; /* 深藍色書本 */
+    --book-color: #4A90A4;
     --book-border: #2C5F6F;
     --page-color: #F5F5DC;
-    --bookmark-color: #E74C3C; /* 紅色書籤 */
+    --bookmark-color: #E74C3C;
     --gold: #FFD700;
     --text-dark: #2C3E50;
     --text-light: #FFFFFF;
@@ -29,7 +29,6 @@
 }
 
 body {
-    /* 木質桌面背景 */
     background: 
         linear-gradient(90deg, transparent 0%, rgba(139, 69, 19, 0.1) 50%, transparent 100%),
         linear-gradient(0deg, rgba(160, 82, 45, 0.15) 0%, transparent 30%),
@@ -48,7 +47,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* 添加桌面木紋質感 */
 body::before {
     content: '';
     position: fixed;
@@ -75,7 +73,6 @@ body::before {
     pointer-events: none;
 }
 
-/* 主容器 */
 .main-container {
     display: flex;
     flex-direction: column;
@@ -87,7 +84,6 @@ body::before {
     z-index: 1;
 }
 
-/* 網站標題 */
 .site-title {
     text-align: center;
     margin-bottom: 3rem;
@@ -128,24 +124,22 @@ body::before {
     }
 }
 
-/* 書本容器 - 確保包含書籤 */
+/* 書本容器 */
 .book-container {
     position: relative;
     margin-bottom: 2rem;
-    /* 為書籤預留更多空間 */
-    padding-right: 60px;
-    /* 防止書本重複 */
-    overflow: hidden;
+    padding-right: 80px; /* 增加右側空間 */
+    overflow: visible; /* 🔧 修復：確保書籤可見 */
 }
 
-/* 平面書本設計 - 根據書籤數量動態調整高度 */
+/* 書本設計 */
 .book {
-    width: 480px; /* 增大寬度 */
-    height: 448px; /* 動態計算：6書籤高度 + 預留空間 */
+    width: 480px;
+    height: 448px;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
-    z-index: 10; /* 確保書本在書籤上方 */
+    z-index: 5; /* 🔧 修復：降低書本層級，讓書籤可以交互 */
 }
 
 .book:hover {
@@ -153,7 +147,6 @@ body::before {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
-/* 書的封面 - 平面設計 */
 .book-cover {
     position: absolute;
     width: 100%;
@@ -175,7 +168,7 @@ body::before {
 }
 
 .book-cover h2 {
-    font-size: 2.2rem; /* 增大字體 */
+    font-size: 2.2rem;
     margin-bottom: 1.2rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     text-align: center;
@@ -184,14 +177,13 @@ body::before {
 }
 
 .book-cover .subtitle {
-    font-size: 1.2rem; /* 增大字體 */
+    font-size: 1.2rem;
     opacity: 0.9;
     font-weight: 300;
     z-index: 2;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 
-/* 書本裝飾 */
 .book-decoration {
     position: absolute;
     width: 100%;
@@ -232,81 +224,58 @@ body::before {
     50% { transform: rotate(180deg); }
 }
 
-/* 移除書的側面厚度效果 */
-.book::before {
-    display: none;
-}
+/* ========== 修復的書籤系統 ========== */
 
-/* ========== 新的個別書籤系統 ========== */
-
-/* 書籤容器 - 移除整體懸停效果 */
+/* 書籤容器 - 完全重新設計 */
 .bookmarks-container {
     position: absolute;
     top: 80px;
-    right: 0;
-    z-index: 5;
+    right: -30px; /* 🔧 修復：調整位置，確保觸發區域正確 */
+    z-index: 20; /* 🔧 修復：提高層級，確保在書本之上 */
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-right: 30px;
     min-height: 360px;
+    pointer-events: auto; /* 🔧 修復：確保可以交互 */
 }
 
-/* 書籤基本狀態 - 完全隱藏，只露出一點邊緣 */
+/* 書籤基本狀態 - 重新設計 */
 .bookmark {
     position: relative;
-    width: 200px;
+    width: 220px; /* 🔧 修復：增加寬度 */
     height: 50px;
     cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    /* 幾乎完全隱藏，只露出一點點讓用戶知道有書籤 */
-    transform: translateX(185px);
-    opacity: 0.15;
+    /* 🔧 修復：簡化 transition，提高穩定性 */
+    transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
+    /* 🔧 修復：調整隱藏位置 */
+    transform: translateX(170px);
+    opacity: 0.3;
     display: flex;
     visibility: visible;
-}
-
-/* 書籤圖標區域 - 始終可見的觸發區域 */
-.bookmark::before {
-    content: '';
-    position: absolute;
-    left: -15px; /* 向左延伸，創建觸發區域 */
-    top: 0;
-    width: 25px; /* 觸發區域寬度 */
-    height: 100%;
-    background: transparent;
+    /* 🔧 修復：確保層級正確 */
     z-index: 10;
-    cursor: pointer;
+    /* 調試：添加邊框確認位置 */
+    /* border: 1px solid rgba(255, 255, 0, 0.3); */
 }
 
-/* ===== 個別書籤懸停效果 ===== */
-/* 只有當前書籤懸停時滑出 */
+/* 🔧 修復：強化懸停效果 */
 .bookmark:hover {
-    transform: translateX(0); /* 完全滑出 */
-    opacity: 1;
-    z-index: 15;
-    /* 突出效果 */
-    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+    z-index: 25 !important;
+    box-shadow: -8px 0 25px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* 未啟用的書籤懸停效果稍微溫和一些 */
+/* 🔧 修復：未啟用書籤的特殊處理 */
 .bookmark[data-enabled="false"]:hover {
-    transform: translateX(10px); /* 不完全滑出 */
-    opacity: 0.8;
-}
-
-/* 移除原有的整體書籤懸停效果 */
-.book:hover ~ .bookmarks-container .bookmark,
-.bookmarks-container:hover .bookmark {
-    /* 移除這些整體效果 */
-    transform: none;
-    opacity: inherit;
+    transform: translateX(20px) !important;
+    opacity: 0.85 !important;
 }
 
 .bookmark-tab {
     width: 100%;
     height: 100%;
-    border-radius: 0 25px 25px 0; /* 右側圓角 */
+    border-radius: 0 25px 25px 0;
     position: relative;
     box-shadow: 3px 2px 12px rgba(0, 0, 0, 0.3);
     overflow: hidden;
@@ -316,21 +285,21 @@ body::before {
     padding: 8px 15px;
     backdrop-filter: blur(5px);
     border: 2px solid rgba(255, 255, 255, 0.1);
+    /* 🔧 修復：確保背景顏色正確應用 */
+    background: var(--bookmark-1);
 }
 
-/* 書籤顏色 - 確保所有6個顏色都定義 */
-.bookmark-color-1 { background: var(--bookmark-1); }
-.bookmark-color-2 { background: var(--bookmark-2); }
-.bookmark-color-3 { background: var(--bookmark-3); }
-.bookmark-color-4 { background: var(--bookmark-4); }
-.bookmark-color-5 { background: var(--bookmark-5); }
-.bookmark-color-6 { background: var(--bookmark-6); }
+/* 書籤顏色 */
+.bookmark-color-1 .bookmark-tab { background: var(--bookmark-1); }
+.bookmark-color-2 .bookmark-tab { background: var(--bookmark-2); }
+.bookmark-color-3 .bookmark-tab { background: var(--bookmark-3); }
+.bookmark-color-4 .bookmark-tab { background: var(--bookmark-4); }
+.bookmark-color-5 .bookmark-tab { background: var(--bookmark-5); }
+.bookmark-color-6 .bookmark-tab { background: var(--bookmark-6); }
+.bookmark-color-7 .bookmark-tab { background: linear-gradient(145deg, #E91E63, #C2185B); }
+.bookmark-color-8 .bookmark-tab { background: linear-gradient(145deg, #9C27B0, #7B1FA2); }
 
-/* 備用顏色，防止超出範圍 */
-.bookmark-color-7 { background: linear-gradient(145deg, #E91E63, #C2185B); }
-.bookmark-color-8 { background: linear-gradient(145deg, #9C27B0, #7B1FA2); }
-
-/* 書籤圖標 - 在隱藏狀態下也部分可見 */
+/* 書籤圖標 */
 .bookmark-icon {
     font-size: 1.6rem;
     margin-right: 10px;
@@ -338,7 +307,6 @@ body::before {
     transition: transform 0.3s ease;
     flex-shrink: 0;
     opacity: 1;
-    /* 確保圖標在隱藏狀態下也能被看到一部分 */
     position: relative;
     z-index: 12;
 }
@@ -347,19 +315,18 @@ body::before {
     transform: scale(1.15);
 }
 
-/* 書籤文字容器 - 只在懸停時顯示 */
+/* 書籤文字 - 懸停時顯示 */
 .bookmark-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     opacity: 0;
     transform: translateX(15px);
-    transition: all 0.4s ease 0.1s;
+    transition: all 0.3s ease 0.1s;
     white-space: nowrap;
     flex-grow: 1;
 }
 
-/* 只有懸停當前書籤時才顯示文字 */
 .bookmark:hover .bookmark-text {
     opacity: 1;
     transform: translateX(0);
@@ -382,7 +349,7 @@ body::before {
     line-height: 1;
 }
 
-/* 即將推出徽章 - 始終可見 */
+/* 即將推出徽章 */
 .coming-soon-badge {
     position: absolute;
     top: 2px;
@@ -415,7 +382,7 @@ body::before {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 
-/* 即將推出模態框 */
+/* 模態框 */
 .modal {
     display: none;
     position: fixed;
@@ -502,7 +469,7 @@ body::before {
     }
     
     .book-container {
-        padding-right: 50px;
+        padding-right: 60px;
     }
     
     .book {
@@ -510,55 +477,25 @@ body::before {
         height: 368px;
     }
     
-    .book:hover {
-        transform: translateY(-3px) scale(1.01);
-    }
-    
     .bookmarks-container {
         top: 65px;
+        right: -20px;
         gap: 6px;
-        padding-right: 25px;
         min-height: 280px;
     }
     
     .bookmark {
-        width: 180px;
+        width: 200px;
         height: 45px;
-        transform: translateX(165px); /* 調整平板隱藏位置 */
+        transform: translateX(150px);
     }
     
     .bookmark:hover {
-        transform: translateX(0);
+        transform: translateX(0) !important;
     }
     
     .bookmark[data-enabled="false"]:hover {
-        transform: translateX(8px);
-    }
-    
-    .bookmark-icon {
-        font-size: 1.5rem;
-        margin-right: 10px;
-    }
-    
-    .bookmark-title {
-        font-size: 0.8rem;
-    }
-    
-    .bookmark-date {
-        font-size: 0.65rem;
-    }
-    
-    .book-cover h2 {
-        font-size: 1.9rem;
-    }
-    
-    .book-cover .subtitle {
-        font-size: 1.05rem;
-    }
-    
-    .coming-soon-badge {
-        font-size: 0.55rem;
-        padding: 2px 6px;
+        transform: translateX(15px) !important;
     }
 }
 
@@ -568,7 +505,7 @@ body::before {
     }
     
     .book-container {
-        padding-right: 40px;
+        padding-right: 50px;
     }
     
     .book {
@@ -578,72 +515,43 @@ body::before {
     
     .bookmarks-container {
         top: 55px;
+        right: -15px;
         gap: 5px;
-        padding-right: 20px;
         min-height: 240px;
     }
     
     .bookmark {
-        width: 160px;
+        width: 180px;
         height: 40px;
-        transform: translateX(145px); /* 調整手機隱藏位置 */
+        transform: translateX(130px);
     }
     
     .bookmark:hover {
-        transform: translateX(0);
+        transform: translateX(0) !important;
     }
     
     .bookmark[data-enabled="false"]:hover {
-        transform: translateX(6px);
-    }
-    
-    .bookmark-icon {
-        font-size: 1.3rem;
-        margin-right: 8px;
-    }
-    
-    .bookmark-title {
-        font-size: 0.75rem;
-    }
-    
-    .bookmark-date {
-        font-size: 0.6rem;
-    }
-    
-    .book-cover h2 {
-        font-size: 1.6rem;
-    }
-    
-    .book-cover .subtitle {
-        font-size: 0.9rem;
-    }
-    
-    .version-info {
-        bottom: 10px;
-        right: 10px;
-        font-size: 0.7rem;
+        transform: translateX(10px) !important;
     }
 }
 
-/* ========== 觸摸設備優化 ========== */
+/* 觸摸設備優化 */
 @media (hover: none) and (pointer: coarse) {
     .bookmark {
-        /* 觸摸設備上稍微露出更多 */
-        transform: translateX(175px);
-        opacity: 0.2;
+        transform: translateX(160px);
+        opacity: 0.4;
     }
     
     .bookmark:active,
     .bookmark:focus {
-        transform: translateX(0);
-        opacity: 1;
+        transform: translateX(0) !important;
+        opacity: 1 !important;
     }
     
-    /* 觸摸設備上的特殊狀態 */
     .bookmark.touch-active {
         transform: translateX(0) !important;
         opacity: 1 !important;
-        z-index: 20 !important;
+        z-index: 25 !important;
     }
 }
 
@@ -651,9 +559,9 @@ body::before {
 .bookmark:focus {
     outline: 2px solid var(--gold);
     outline-offset: 2px;
-    transform: translateX(0);
-    opacity: 1;
-    z-index: 15;
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+    z-index: 25 !important;
 }
 
 /* 性能優化 */

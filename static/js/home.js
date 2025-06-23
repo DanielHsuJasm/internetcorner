@@ -278,10 +278,12 @@ function initBookmarkClickHandlers() {
         if (isEnabled) {
             // 啟用的書籤 - 導航到頁面
             const route = bookmark.dataset.route;
-            if (route) {
+            if (route && route !== '#') {
                 handleBookmarkNavigation(route, bookmarkId);
             } else {
-                console.error('未找到路由信息:', bookmarkId);
+                console.log('書籤路由未設定或為 #，顯示即將推出');
+                const title = bookmark.dataset.title || bookmarkId;
+                handleComingSoonBookmark(title, bookmarkId);
             }
         } else {
             // 未啟用的書籤 - 顯示即將推出

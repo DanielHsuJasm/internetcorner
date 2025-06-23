@@ -38,11 +38,12 @@
                 <div class="bookmark" 
                      data-bookmark-id="{{ bookmark.id }}"
                      data-enabled="{{ bookmark.enabled|lower }}"
-                     {% if bookmark.enabled %}
-                     data-route="{{ url_for(bookmark.route) }}"
+                     {% if bookmark.enabled and bookmark.route == 'memory.index' %}
+                        data-route="{{ url_for(bookmark.route) }}"
                      {% else %}
-                     data-title="{{ bookmark.title|e }}"
-                     {% endif %}>
+                        data-route="#"
+                     {% endif %}
+                     data-title="{{ bookmark.title|e }}">
                     <div class="bookmark-tab bookmark-color-{{ loop.index }}">
                         <div class="bookmark-icon">{{ bookmark.icon }}</div>
                         <div class="bookmark-text">
