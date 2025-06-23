@@ -40,4 +40,4 @@ build/
 
 .gitignore
 .Procfile
-.docs
+*.docs/
