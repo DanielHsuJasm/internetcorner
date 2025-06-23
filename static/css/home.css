@@ -1,5 +1,3 @@
-/* 更新 home.css - 平面書本設計與桌面背景 */
-
 :root {
     /* 保持原有變數 */
     --book-color: #4A90A4; /* 深藍色書本 */
@@ -152,10 +150,10 @@ body::before {
     overflow: hidden;
 }
 
-/* 平面書本設計 - 加大尺寸 */
+/* 平面書本設計 - 根據書籤數量動態調整高度 */
 .book {
     width: 480px; /* 增大寬度 */
-    height: 360px; /* 增大高度 */
+    height: 400px; /* 增加高度以容納6個書籤 */
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
@@ -253,18 +251,18 @@ body::before {
 
 /* 移除紅色書籤 */
 
-/* 書籤容器 - 完全隱藏在書本內部 */
+/* 書籤容器 - 調整位置以適應更高的書本 */
 .bookmarks-container {
     position: absolute;
-    top: 60px; /* 調整垂直位置 */
+    top: 70px; /* 調整垂直位置 */
     right: 0; /* 緊貼書本右邊 */
     z-index: 5; /* 降低層級，讓它在書本後面 */
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding-right: 30px; /* 增加內邊距，確保完全隱藏 */
-    /* 調試：確保容器足夠高 */
-    min-height: 280px;
+    /* 確保容器足夠高以容納所有書籤 */
+    min-height: 320px;
 }
 
 /* 書本懸停時顯示書籤 */
@@ -273,7 +271,7 @@ body::before {
     z-index: 15; /* 懸停時提高層級 */
 }
 
-/* 橫向書籤設計 - 完全隱藏 */
+/* 橫向書籤設計 - 移除調試樣式 */
 .bookmark {
     position: relative;
     width: 200px; /* 增大寬度 */
@@ -282,9 +280,9 @@ body::before {
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform: translateX(170px); /* 完全隱藏在書本內，只露出圖標邊緣 */
     opacity: 0.2; /* 更加透明 */
-    /* 調試：確保所有書籤都顯示 */
-    display: flex !important;
-    visibility: visible !important;
+    /* 移除調試樣式 */
+    display: flex;
+    visibility: visible;
 }
 
 /* 書本懸停或書籤懸停時顯示 */
@@ -495,7 +493,7 @@ body::before {
     box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
 }
 
-/* 響應式設計 - 更新大書本尺寸 */
+/* 響應式設計 - 更新書本尺寸 */
 @media (max-width: 768px) {
     .main-container {
         padding: 1rem;
@@ -511,7 +509,7 @@ body::before {
     
     .book {
         width: 380px; /* 平板尺寸 */
-        height: 285px;
+        height: 320px; /* 相應調整高度 */
     }
     
     .book:hover {
@@ -519,9 +517,10 @@ body::before {
     }
     
     .bookmarks-container {
-        top: 50px;
+        top: 60px;
         gap: 6px;
         padding-right: 25px;
+        min-height: 240px; /* 調整容器高度 */
     }
     
     .bookmark {
@@ -577,13 +576,14 @@ body::before {
     
     .book {
         width: 320px; /* 手機尺寸 */
-        height: 240px;
+        height: 270px; /* 相應調整高度 */
     }
     
     .bookmarks-container {
-        top: 40px;
+        top: 50px;
         gap: 5px;
         padding-right: 20px;
+        min-height: 200px; /* 調整容器高度 */
     }
     
     .bookmark {
