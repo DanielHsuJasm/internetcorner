@@ -45,11 +45,11 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             date="xxxx.06.26"
         ),
         BookmarkConfig(
-            id="travel_log",
+            id="anniversary",
             title="開發中",
             icon="🗺️",
             color="#45B7D1",
-            route="travel.index", 
+            route="anniversary.index", 
             description="足跡遍佈的美好時光",
             enabled=False,  # 未啟用功能
             date=" "
