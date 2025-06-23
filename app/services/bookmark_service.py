@@ -41,7 +41,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             color="#4ECDC4", 
             route="diary.index",
             description="記錄每一天的心情",
-            enabled=False,  # Feature
+            enabled=False,  # 未啟用功能
             date="2024.07"
         ),
         BookmarkConfig(
@@ -51,7 +51,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             color="#45B7D1",
             route="travel.index", 
             description="足跡遍佈的美好時光",
-            enabled=False,  # Feature
+            enabled=False,  # 未啟用功能
             date="2024.08"
         ),
         BookmarkConfig(
@@ -61,7 +61,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             color="#96CEB4",
             route="music.index",
             description="收藏喜愛的音樂回憶",
-            enabled=False,  # Feature
+            enabled=False,  # 未啟用功能
             date="2024.09"
         ),
         BookmarkConfig(
@@ -71,7 +71,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             color="#FFEAA7",
             route="todo.index",
             description="規劃未來的美好",
-            enabled=False,  # Feature
+            enabled=False,  # 未啟用功能
             date="2024.10"
         ),
         BookmarkConfig(
@@ -81,7 +81,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             color="#DDA0DD",
             route="recipe.index",
             description="美味料理的秘密",
-            enabled=False,  # Feature
+            enabled=False,  # 未啟用功能
             date="2024.11"
         )
     ]

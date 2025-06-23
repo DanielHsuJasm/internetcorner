@@ -21,7 +21,15 @@
             <p>我的數位回憶收藏</p>
         </div>
 
-        <!-- 書本容器 -->
+        <!-- 調試信息 -->
+        <div style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 9999;">
+            書籤總數: {{ bookmarks|length }}
+            {% for bookmark in bookmarks %}
+            <br>{{ loop.index }}: {{ bookmark.title }}
+            {% endfor %}
+        </div>
+
+        <!-- 書本容器（確保只有一個） -->
         <div class="book-container">
             <!-- 書本本體 -->
             <div class="book">
@@ -35,27 +43,33 @@
                 </div>
             </div>
 
-            <!-- 書籤容器 -->
+            <!-- 書籤容器（隱藏在書本內部） -->
             <div class="bookmarks-container">
                 {% for bookmark in bookmarks %}
-                <div class="bookmark" 
+                <div class="bookmark bookmark-debug-{{ loop.index }}" 
                      data-bookmark-id="{{ bookmark.id }}"
                      data-enabled="{{ bookmark.enabled|lower }}"
-                     onclick="{% if bookmark.enabled %}navigateToPage('{{ url_for(bookmark.route) }}'){% else %}showComingSoon('{{ bookmark.title }}'){% endif %}">
-                    <div class="bookmark-tab bookmark-color-{{ loop.index }}">
+                     data-debug-index="{{ loop.index }}"
+                     {% if bookmark.enabled %}
+                     data-route="{{ url_for(bookmark.route) }}"
+                     {% else %}
+                     data-title="{{ bookmark.title|e }}"
+                     {% endif %}
+                     style="border: 2px solid red; /* 調試邊框 */">
+                    <div class="bookmark-tab bookmark-color-{{ loop.index }}" 
+                         style="position: relative;">
                         <div class="bookmark-icon">{{ bookmark.icon }}</div>
-                        <div class="bookmark-date">{{ bookmark.date }}</div>
-                        <div class="bookmark-title">{{ bookmark.title }}</div>
+                        <div class="bookmark-text">
+                            <div class="bookmark-title">{{ bookmark.title }}</div>
+                            <div class="bookmark-date">{{ bookmark.date }}</div>
+                        </div>
                         {% if not bookmark.enabled %}
                         <div class="coming-soon-badge">敬請期待</div>
                         {% endif %}
-                    </div>
-                    <div class="bookmark-tooltip">
-                        <div class="tooltip-title">{{ bookmark.title }}</div>
-                        <div class="tooltip-description">{{ bookmark.description }}</div>
-                        {% if not bookmark.enabled %}
-                        <div class="tooltip-status">🚧 開發中...</div>
-                        {% endif %}
+                        <!-- 調試標籤 -->
+                        <div style="position: absolute; top: -15px; left: 5px; background: yellow; color: black; font-size: 10px; padding: 2px;">
+                            #{{ loop.index }}
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -83,5 +97,20 @@
     <!-- 載入腳本 -->
     <script src="{{ url_for('static', filename='js/star-background.js') }}"></script>
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    
+    <!-- 調試腳本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 調試信息:');
+            console.log('書籤總數:', document.querySelectorAll('.bookmark').length);
+            
+            document.querySelectorAll('.bookmark').forEach((bookmark, index) => {
+                const title = bookmark.querySelector('.bookmark-title')?.textContent;
+                const id = bookmark.dataset.bookmarkId;
+                const colorClass = bookmark.querySelector('.bookmark-tab')?.className;
+                console.log(`書籤 ${index + 1}: ${title} (${id}) - ${colorClass}`);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,8 +1,3 @@
-/**
- * 優化的信封信件功能模組
- * 解決性能卡頓問題
- */
-
 class LetterManager {
     constructor() {
         this.envelopeContainer = null;
