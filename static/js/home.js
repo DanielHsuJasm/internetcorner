@@ -755,16 +755,815 @@ window.resetAllBookmarks = resetAllBookmarks;
 // 舊的函數名稱向後兼容
 window.initBookmarkHoverEffects = initIndividualBookmarkEffects;
 
-console.log('🎮 個別書籤右滑功能已就緒');
-console.log('💡 可用指令:');
-console.log('  bookmarkManager.enableBookmark("birthday") - 啟用書籤');
-console.log('  bookmarkManager.getBookmarkStatus() - 獲取狀態');
-console.log('  bookmarkManager.showAllBookmarks() - 預覽所有書籤');
-console.log('  bookmarkManager.hideAllBookmarks() - 隱藏所有書籤');
-console.log('  resetAllBookmarks() - 重置所有書籤狀態');
-console.log('  showComingSoon("測試功能") - 顯示即將推出');
-console.log('📖 操作說明:');
-console.log('  - 懸停個別書籤：只有該書籤會滑出');
-console.log('  - 觸摸設備：輕觸書籤展開，3秒後自動收回');
-console.log('  - 鍵盤導航：方向鍵選擇，Enter/Space 激活，ESC 隱藏');
-console.log('  - 書本懸停 0.8 秒：預覽所有書籤');
+
+/**
+ * 強化版書籤修復 - 確保鮮豔顏色且完全不透過
+ */
+function applyEnhancedBookmarkFixes() {
+    console.log('🔧 應用強化版書籤修復...');
+    
+    const bookmarks = document.querySelectorAll('.bookmark');
+    
+    // 更鮮豔的顏色配置
+    const vibrantColors = {
+        '1': '#FF4757', // 鮮豔紅色
+        '2': '#2ED573', // 鮮豔綠色
+        '3': '#3742FA', // 鮮豔藍色
+        '4': '#2F3542', // 深灰色
+        '5': '#FFA502', // 鮮豔橙色
+        '6': '#A4B0BE', // 淺藍灰
+        '7': '#FF3838', // 亮紅色
+        '8': '#8B5CF6'  // 紫色
+    };
+    
+    bookmarks.forEach((bookmark, index) => {
+        const tab = bookmark.querySelector('.bookmark-tab');
+        const icon = bookmark.querySelector('.bookmark-icon');
+        const text = bookmark.querySelector('.bookmark-text');
+        const badge = bookmark.querySelector('.coming-soon-badge');
+        
+        if (!tab || !icon || !text) {
+            console.warn(`書籤 ${index} 結構不完整`);
+            return;
+        }
+        
+        // 🔧 強制設定超高層級
+        bookmark.style.cssText += `
+            z-index: 45 !important;
+            isolation: isolate !important;
+        `;
+        
+        // 🔧 確定書籤顏色類別
+        let colorIndex = '1'; // 預設
+        for (let i = 1; i <= 8; i++) {
+            if (tab.classList.contains(`bookmark-color-${i}`)) {
+                colorIndex = i.toString();
+                break;
+            }
+        }
+        
+        // 🔧 強制應用鮮豔背景色
+        const vibrantColor = vibrantColors[colorIndex];
+        tab.style.cssText += `
+            background: ${vibrantColor} !important;
+            background-color: ${vibrantColor} !important;
+            background-image: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            mix-blend-mode: normal !important;
+            filter: none !important;
+            opacity: 1 !important;
+            contain: layout style paint !important;
+            transform: translateZ(0) !important;
+        `;
+        
+        // 🔧 創建多層背景保護
+        removeExistingBackgroundLayers(tab);
+        createBackgroundLayers(tab, vibrantColor);
+        
+        // 🔧 圖標強化定位
+        icon.style.cssText += `
+            position: absolute !important;
+            right: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-size: 1.8rem !important;
+            z-index: 60 !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8)) !important;
+        `;
+        
+        // 🔧 文字內容設定
+        text.style.cssText += `
+            max-width: calc(100% - 70px) !important;
+            z-index: 55 !important;
+        `;
+        
+        // 🔧 徽章設定
+        if (badge) {
+            badge.style.cssText += `
+                right: 50px !important;
+                z-index: 65 !important;
+                background: rgba(255, 165, 0, 1) !important;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+            `;
+        }
+        
+        console.log(`📑 書籤 ${index} 已應用顏色: ${vibrantColor}`);
+    });
+    
+    // 🔧 確保容器層級
+    const bookContainer = document.querySelector('.book-container');
+    const bookmarksContainer = document.querySelector('.bookmarks-container');
+    const book = document.querySelector('.book');
+    const bookCover = document.querySelector('.book-cover');
+    
+    if (bookContainer) {
+        bookContainer.style.cssText += `
+            z-index: 1 !important;
+            overflow: visible !important;
+        `;
+    }
+    
+    if (book) {
+        book.style.cssText += `z-index: 2 !important;`;
+    }
+    
+    if (bookCover) {
+        bookCover.style.cssText += `z-index: 1 !important;`;
+    }
+    
+    if (bookmarksContainer) {
+        bookmarksContainer.style.cssText += `
+            z-index: 50 !important;
+            pointer-events: auto !important;
+        `;
+    }
+    
+    console.log('✅ 強化版書籤修復完成');
+}
+
+/**
+ * 移除現有的背景保護層
+ */
+function removeExistingBackgroundLayers(element) {
+    const existingLayers = element.querySelectorAll('.bookmark-bg-layer');
+    existingLayers.forEach(layer => layer.remove());
+}
+
+/**
+ * 創建多層背景保護
+ */
+function createBackgroundLayers(element, color) {
+    // 創建第一層背景保護
+    const layer1 = document.createElement('div');
+    layer1.className = 'bookmark-bg-layer';
+    layer1.style.cssText = `
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: ${color} !important;
+        z-index: -1 !important;
+        pointer-events: none !important;
+    `;
+    
+    // 創建第二層背景保護
+    const layer2 = document.createElement('div');
+    layer2.className = 'bookmark-bg-layer';
+    layer2.style.cssText = `
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: ${color} !important;
+        z-index: -2 !important;
+        pointer-events: none !important;
+    `;
+    
+    element.appendChild(layer1);
+    element.appendChild(layer2);
+}
+
+/**
+ * 增強懸停效果
+ */
+function enhanceHoverEffects() {
+    const bookmarks = document.querySelectorAll('.bookmark');
+    
+    bookmarks.forEach(bookmark => {
+        const icon = bookmark.querySelector('.bookmark-icon');
+        const text = bookmark.querySelector('.bookmark-text');
+        const tab = bookmark.querySelector('.bookmark-tab');
+        
+        bookmark.addEventListener('mouseenter', function() {
+            // 圖標效果
+            if (icon) {
+                icon.style.cssText += `
+                    transform: translateY(-50%) scale(1.2) !important;
+                    filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9)) !important;
+                `;
+            }
+            
+            // 文字效果
+            if (text) {
+                text.style.cssText += `
+                    opacity: 1 !important;
+                    transform: translateX(0) !important;
+                `;
+            }
+            
+            // 書籤標籤亮度效果
+            if (tab) {
+                tab.style.cssText += `
+                    filter: brightness(1.05) saturate(1.1) !important;
+                `;
+            }
+            
+            // 提升層級
+            this.style.cssText += `
+                z-index: 100 !important;
+            `;
+        });
+        
+        bookmark.addEventListener('mouseleave', function() {
+            // 恢復圖標
+            if (icon) {
+                icon.style.transform = 'translateY(-50%) !important';
+                icon.style.filter = 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8)) !important';
+            }
+            
+            // 恢復文字
+            if (text) {
+                text.style.opacity = '';
+                text.style.transform = '';
+            }
+            
+            // 恢復書籤標籤
+            if (tab) {
+                tab.style.filter = '';
+            }
+            
+            // 恢復層級
+            this.style.zIndex = '45';
+        });
+    });
+}
+
+/**
+ * 強制顏色修復（緊急修復函數）
+ */
+function forceColorFix() {
+    console.log('🚨 執行緊急顏色修復...');
+    
+    const vibrantColors = {
+        '1': '#FF4757',
+        '2': '#2ED573', 
+        '3': '#3742FA',
+        '4': '#2F3542',
+        '5': '#FFA502',
+        '6': '#A4B0BE',
+        '7': '#FF3838',
+        '8': '#8B5CF6'
+    };
+    
+    document.querySelectorAll('.bookmark-tab').forEach((tab, index) => {
+        // 強制移除所有可能的透明效果
+        tab.style.cssText = `
+            background: ${vibrantColors[(index % 8) + 1]} !important;
+            background-color: ${vibrantColors[(index % 8) + 1]} !important;
+            background-image: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            mix-blend-mode: normal !important;
+            filter: none !important;
+            opacity: 1 !important;
+            z-index: 50 !important;
+            position: relative !important;
+            border-radius: 25px 0 0 25px !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 8px 55px 8px 15px !important;
+            box-shadow: -3px 2px 15px rgba(0, 0, 0, 0.4) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        `;
+        
+        console.log(`🎨 強制修復書籤 ${index}: ${vibrantColors[(index % 8) + 1]}`);
+    });
+}
+
+/**
+ * 檢查書籤顯示狀態
+ */
+function checkBookmarkStatus() {
+    const bookmarks = document.querySelectorAll('.bookmark');
+    console.log('📊 書籤狀態檢查:');
+    
+    bookmarks.forEach((bookmark, index) => {
+        const tab = bookmark.querySelector('.bookmark-tab');
+        const icon = bookmark.querySelector('.bookmark-icon');
+        
+        if (tab) {
+            const computedStyle = window.getComputedStyle(tab);
+            const backgroundColor = computedStyle.backgroundColor;
+            const zIndex = computedStyle.zIndex;
+            const opacity = computedStyle.opacity;
+            
+            console.log(`書籤 ${index + 1}:`, {
+                backgroundColor,
+                zIndex,
+                opacity,
+                position: computedStyle.position
+            });
+        }
+        
+        if (icon) {
+            const iconStyle = window.getComputedStyle(icon);
+            console.log(`圖標 ${index + 1}:`, {
+                position: iconStyle.position,
+                right: iconStyle.right,
+                zIndex: iconStyle.zIndex
+            });
+        }
+    });
+}
+
+/**
+ * 一鍵修復所有問題
+ */
+function fixAllBookmarkIssues() {
+    console.log('🔧 執行完整書籤修復流程...');
+    
+    // 步驟 1: 基礎修復
+    applyEnhancedBookmarkFixes();
+    
+    // 步驟 2: 強制顏色修復
+    setTimeout(() => {
+        forceColorFix();
+    }, 100);
+    
+    // 步驟 3: 增強效果
+    setTimeout(() => {
+        enhanceHoverEffects();
+    }, 200);
+    
+    // 步驟 4: 最終檢查
+    setTimeout(() => {
+        checkBookmarkStatus();
+        console.log('✅ 完整修復流程完成！');
+    }, 500);
+}
+
+// 在現有的 DOMContentLoaded 事件中添加強化修復
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 啟動強化版書籤修復系統...');
+    
+    // 立即執行基礎修復
+    setTimeout(() => {
+        applyEnhancedBookmarkFixes();
+        enhanceHoverEffects();
+    }, 100);
+    
+    // 延遲執行強制修復（確保所有樣式已載入）
+    setTimeout(() => {
+        forceColorFix();
+    }, 300);
+    
+    // 最終確保修復
+    setTimeout(() => {
+        applyEnhancedBookmarkFixes();
+        console.log('✅ 強化版書籤修復完成！');
+    }, 500);
+});
+
+// 頁面完全載入後的最終修復
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        fixAllBookmarkIssues();
+    }, 200);
+});
+
+// 導出修復函數供調試使用
+window.applyEnhancedBookmarkFixes = applyEnhancedBookmarkFixes;
+window.forceColorFix = forceColorFix;
+window.fixAllBookmarkIssues = fixAllBookmarkIssues;
+window.checkBookmarkStatus = checkBookmarkStatus;
+window.enhanceHoverEffects = enhanceHoverEffects;
+
+console.log('🔧 強化版書籤修復系統已整合到 home.js');
+console.log('💡 可用的調試指令:');
+console.log('  fixAllBookmarkIssues() - 一鍵修復所有問題');
+console.log('  forceColorFix() - 強制修復顏色');
+console.log('  checkBookmarkStatus() - 檢查書籤狀態');
+console.log('  applyEnhancedBookmarkFixes() - 基礎修復');
+
+// 添加鍵盤快速修復功能（開發用）
+document.addEventListener('keydown', function(e) {
+    // Ctrl + Shift + F = 強制修復
+    if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+        e.preventDefault();
+        console.log('🔧 鍵盤快速修復觸發！');
+        fixAllBookmarkIssues();
+    }
+    
+    // Ctrl + Shift + C = 檢查狀態
+    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        checkBookmarkStatus();
+    }
+});
+
+// 監聽窗口大小變化，重新應用修復
+let resizeTimeout;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        console.log('🔧 窗口大小改變，重新應用修復...');
+        applyEnhancedBookmarkFixes();
+        forceColorFix();
+    }, 250);
+});
+
+// ===== 書籤修復代碼結束 =====
+
+
+
+
+/**
+ * 模態框管理類
+ */
+class ModalManager {
+    constructor() {
+        this.modal = null;
+        this.isOpen = false;
+        this.init();
+    }
+    
+    init() {
+        this.modal = document.getElementById('coming-soon-modal');
+        if (!this.modal) {
+            console.warn('模態框元素未找到');
+            return;
+        }
+        
+        this.setupEventListeners();
+        this.fixModalStructure();
+        console.log('✅ 模態框管理器已初始化');
+    }
+    
+    /**
+     * 修復模態框結構
+     */
+    fixModalStructure() {
+        if (!this.modal) return;
+        
+        // 🔧 確保模態框有正確的屬性
+        this.modal.setAttribute('role', 'dialog');
+        this.modal.setAttribute('aria-modal', 'true');
+        this.modal.setAttribute('aria-hidden', 'true');
+        this.modal.setAttribute('tabindex', '-1');
+        
+        // 🔧 確保模態框有正確的樣式
+        this.modal.style.cssText += `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 99999 !important;
+            display: none !important;
+        `;
+        
+        // 🔧 確保內容容器正確
+        const content = this.modal.querySelector('.modal-content');
+        if (content) {
+            content.style.cssText += `
+                position: relative !important;
+                margin: 0 !important;
+                transform: translateZ(0) !important;
+            `;
+        }
+        
+        // 🔧 確保按鈕正確
+        const buttons = this.modal.querySelectorAll('.modal-buttons button');
+        buttons.forEach(button => {
+            button.style.cssText += `
+                position: relative !important;
+                z-index: 1 !important;
+                cursor: pointer !important;
+            `;
+            
+            // 確保按鈕有點擊事件
+            if (!button.onclick && !button.hasAttribute('onclick')) {
+                button.addEventListener('click', () => this.close());
+            }
+        });
+    }
+    
+    /**
+     * 設置事件監聽器
+     */
+    setupEventListeners() {
+        if (!this.modal) return;
+        
+        // 🔧 點擊背景關閉
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                this.close();
+            }
+        });
+        
+        // 🔧 ESC 鍵關閉
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.close();
+            }
+        });
+        
+        // 🔧 處理所有關閉按鈕
+        const closeButtons = this.modal.querySelectorAll('button, [data-dismiss="modal"]');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => this.close());
+        });
+    }
+    
+    /**
+     * 顯示模態框
+     */
+    show(title = '即將推出！', message = '這個功能正在努力開發中，請耐心等待！', icon = '🚧') {
+        if (!this.modal) {
+            console.error('模態框未找到，無法顯示');
+            return;
+        }
+        
+        console.log(`📢 顯示模態框: ${title}`);
+        
+        // 🔧 更新內容
+        this.updateContent(title, message, icon);
+        
+        // 🔧 防止背景滾動
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+        
+        // 🔧 顯示模態框
+        this.modal.style.display = 'flex';
+        this.modal.setAttribute('aria-hidden', 'false');
+        
+        // 🔧 觸發顯示動畫
+        setTimeout(() => {
+            this.modal.classList.add('show');
+        }, 10);
+        
+        // 🔧 聚焦到模態框
+        setTimeout(() => {
+            const firstButton = this.modal.querySelector('.modal-buttons button');
+            if (firstButton) {
+                firstButton.focus();
+            } else {
+                this.modal.focus();
+            }
+        }, 100);
+        
+        this.isOpen = true;
+        
+        // 🔧 觸發自定義事件
+        this.dispatchEvent('modal:show', { title, message, icon });
+    }
+    
+    /**
+     * 關閉模態框
+     */
+    close() {
+        if (!this.modal || !this.isOpen) return;
+        
+        console.log('📢 關閉模態框');
+        
+        // 🔧 添加淡出動畫
+        this.modal.classList.add('fade-out');
+        this.modal.classList.remove('show');
+        
+        // 🔧 延遲隱藏
+        setTimeout(() => {
+            this.modal.style.display = 'none';
+            this.modal.setAttribute('aria-hidden', 'true');
+            this.modal.classList.remove('fade-out');
+            
+            // 🔧 恢復背景滾動
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            
+            // 🔧 恢復焦點
+            document.body.focus();
+            
+            this.isOpen = false;
+            
+            // 🔧 觸發自定義事件
+            this.dispatchEvent('modal:close');
+        }, 300);
+    }
+    
+    /**
+     * 更新模態框內容
+     */
+    updateContent(title, message, icon) {
+        const titleElement = this.modal.querySelector('#feature-name') || this.modal.querySelector('h3');
+        const messageElement = this.modal.querySelector('p');
+        const iconElement = this.modal.querySelector('.modal-icon');
+        
+        if (titleElement) {
+            titleElement.textContent = title;
+        }
+        
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+        
+        if (iconElement) {
+            iconElement.textContent = icon;
+        }
+    }
+    
+    /**
+     * 觸發自定義事件
+     */
+    dispatchEvent(eventName, detail = {}) {
+        const event = new CustomEvent(eventName, {
+            detail: { modalManager: this, ...detail },
+            bubbles: true
+        });
+        document.dispatchEvent(event);
+    }
+    
+    /**
+     * 檢查模態框狀態
+     */
+    getStatus() {
+        return {
+            isOpen: this.isOpen,
+            element: this.modal,
+            display: this.modal ? window.getComputedStyle(this.modal).display : 'none',
+            zIndex: this.modal ? window.getComputedStyle(this.modal).zIndex : 'auto'
+        };
+    }
+    
+    /**
+     * 強制修復模態框
+     */
+    forceRepair() {
+        console.log('🔧 強制修復模態框...');
+        
+        if (!this.modal) {
+            console.error('模態框元素不存在，無法修復');
+            return;
+        }
+        
+        // 🔧 重置所有樣式
+        this.modal.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 99999 !important;
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: blur(5px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+        `;
+        
+        const content = this.modal.querySelector('.modal-content');
+        if (content) {
+            content.style.cssText = `
+                background: linear-gradient(145deg, #ffffff, #f8f9fa) !important;
+                padding: 2.5rem !important;
+                border-radius: 20px !important;
+                width: 90% !important;
+                max-width: 450px !important;
+                text-align: center !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4) !important;
+                position: relative !important;
+                border: 2px solid rgba(255, 215, 0, 0.3) !important;
+            `;
+        }
+        
+        this.fixModalStructure();
+        console.log('✅ 模態框強制修復完成');
+    }
+}
+
+/**
+ * 創建全域模態框管理器實例
+ */
+let modalManager = null;
+
+/**
+ * 初始化模態框系統
+ */
+function initModalSystem() {
+    modalManager = new ModalManager();
+    
+    // 🔧 等待 DOM 元素確實存在
+    if (!modalManager.modal) {
+        setTimeout(() => {
+            modalManager = new ModalManager();
+        }, 500);
+    }
+}
+
+/**
+ * 顯示即將推出提示（兼容舊函數）
+ */
+function showComingSoon(featureName = '新功能') {
+    if (!modalManager) {
+        initModalSystem();
+        setTimeout(() => showComingSoon(featureName), 100);
+        return;
+    }
+    
+    const title = `${featureName} - 即將推出！`;
+    const message = '這個功能正在努力開發中，請耐心等待！';
+    modalManager.show(title, message, '🚧');
+}
+
+/**
+ * 關閉模態框（兼容舊函數）
+ */
+function closeComingSoonModal() {
+    if (modalManager) {
+        modalManager.close();
+    }
+}
+
+/**
+ * 檢查模態框狀態
+ */
+function checkModalStatus() {
+    if (modalManager) {
+        const status = modalManager.getStatus();
+        console.log('📊 模態框狀態:', status);
+        return status;
+    }
+    return { error: '模態框管理器未初始化' };
+}
+
+/**
+ * 強制修復模態框
+ */
+function fixModal() {
+    if (modalManager) {
+        modalManager.forceRepair();
+    } else {
+        console.log('🔧 重新初始化模態框系統...');
+        initModalSystem();
+        setTimeout(() => {
+            if (modalManager) {
+                modalManager.forceRepair();
+            }
+        }, 200);
+    }
+}
+
+// 🔧 在 DOMContentLoaded 事件中初始化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 初始化模態框系統...');
+    setTimeout(initModalSystem, 100);
+});
+
+// 🔧 頁面完全載入後再次確保
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        if (!modalManager || !modalManager.modal) {
+            console.log('🔧 頁面載入完成，重新初始化模態框...');
+            initModalSystem();
+        }
+    }, 200);
+});
+
+// 🔧 導出函數到全域作用域
+window.modalManager = modalManager;
+window.showComingSoon = showComingSoon;
+window.closeComingSoonModal = closeComingSoonModal;
+window.checkModalStatus = checkModalStatus;
+window.fixModal = fixModal;
+window.initModalSystem = initModalSystem;
+
+// 🔧 點擊模態框背景關閉（全域事件）
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('coming-soon-modal');
+    if (e.target === modal && modalManager) {
+        modalManager.close();
+    }
+});
+
+// 🔧 鍵盤快捷鍵（調試用）
+document.addEventListener('keydown', function(e) {
+    // Ctrl + Shift + M = 檢查模態框狀態
+    if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        checkModalStatus();
+    }
+    
+    // Ctrl + Shift + R = 修復模態框
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        fixModal();
+    }
+});
+
+console.log('🔧 模態框修復系統已載入');
+console.log('💡 可用的調試指令:');
+console.log('  showComingSoon("測試功能") - 顯示模態框');
+console.log('  closeComingSoonModal() - 關閉模態框');
+console.log('  checkModalStatus() - 檢查狀態');
+console.log('  fixModal() - 強制修復');
+console.log('  modalManager.forceRepair() - 深度修復');
+console.log('🎮 鍵盤快捷鍵:');
+console.log('  Ctrl + Shift + M - 檢查模態框狀態');
+console.log('  Ctrl + Shift + R - 修復模態框');
+
+// ===== 模態框修復代碼結束 =====
