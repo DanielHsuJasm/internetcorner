@@ -75,18 +75,6 @@ body::before {
     pointer-events: none;
 }
 
-/* 星空背景 Canvas */
-#star-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0.7; /* 降低透明度，讓桌面更明顯 */
-}
-
 /* 主容器 */
 .main-container {
     display: flex;
@@ -153,7 +141,8 @@ body::before {
 /* 平面書本設計 - 根據書籤數量動態調整高度 */
 .book {
     width: 480px; /* 增大寬度 */
-    height: 400px; /* 增加高度以容納6個書籤 */
+    /* 6個書籤 * 58px(高度+間距) + 起始位置80px + 至少30px(3公分)預留 = 448px */
+    height: 448px; /* 動態計算：6書籤高度 + 預留空間 */
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
@@ -249,20 +238,18 @@ body::before {
     display: none;
 }
 
-/* 移除紅色書籤 */
-
 /* 書籤容器 - 調整位置以適應更高的書本 */
 .bookmarks-container {
     position: absolute;
-    top: 70px; /* 調整垂直位置 */
+    top: 80px; /* 調整垂直位置以有更多頂部空間 */
     right: 0; /* 緊貼書本右邊 */
     z-index: 5; /* 降低層級，讓它在書本後面 */
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding-right: 30px; /* 增加內邊距，確保完全隱藏 */
-    /* 確保容器足夠高以容納所有書籤 */
-    min-height: 320px;
+    /* 確保容器足夠高以容納所有書籤，預留額外空間 */
+    min-height: 360px; /* 6個書籤的空間 + 額外預留 */
 }
 
 /* 書本懸停時顯示書籤 */
@@ -402,10 +389,6 @@ body::before {
     50% { opacity: 1; }
 }
 
-/* 移除書籤尖角效果（橫向不需要） */
-
-/* 移除原有工具提示（改用內建文字） */
-
 /* 版本資訊 */
 .version-info {
     position: absolute;
@@ -509,7 +492,7 @@ body::before {
     
     .book {
         width: 380px; /* 平板尺寸 */
-        height: 320px; /* 相應調整高度 */
+        height: 368px; /* 相應調整高度：6書籤 + 預留空間的平板版本 */
     }
     
     .book:hover {
@@ -517,10 +500,10 @@ body::before {
     }
     
     .bookmarks-container {
-        top: 60px;
+        top: 65px; /* 調整平板版垂直位置 */
         gap: 6px;
         padding-right: 25px;
-        min-height: 240px; /* 調整容器高度 */
+        min-height: 280px; /* 調整容器高度以配合較小的書本 */
     }
     
     .bookmark {
@@ -576,14 +559,14 @@ body::before {
     
     .book {
         width: 320px; /* 手機尺寸 */
-        height: 270px; /* 相應調整高度 */
+        height: 308px; /* 相應調整高度：適合手機的6書籤高度 */
     }
     
     .bookmarks-container {
-        top: 50px;
+        top: 55px; /* 調整手機版垂直位置 */
         gap: 5px;
         padding-right: 20px;
-        min-height: 200px; /* 調整容器高度 */
+        min-height: 240px; /* 調整容器高度以配合手機版書本 */
     }
     
     .bookmark {
