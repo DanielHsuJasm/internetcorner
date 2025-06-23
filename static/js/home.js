@@ -515,6 +515,6 @@ window.hideLoadingAnimation = hideLoadingAnimation;
 
 console.log('🎮 修復後的主畫面交互功能已就緒');
 console.log('💡 可用指令:');
-console.log('  bookmarkManager.enableBookmark("diary") - 啟用書籤');
+console.log('  bookmarkManager.enableBookmark("birthday") - 啟用書籤');
 console.log('  bookmarkManager.getBookmarkStatus() - 獲取狀態');
 console.log('  showComingSoon("測試功能") - 顯示即將推出');

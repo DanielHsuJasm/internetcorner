@@ -35,54 +35,24 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             date="2024.06"
         ),
         BookmarkConfig(
-            id="diary",
-            title="心情日記",
-            icon="📔",
+            id="birthday",
+            title="生日",
+            icon="🎂",
             color="#4ECDC4", 
-            route="diary.index",
-            description="記錄每一天的心情",
-            enabled=False,  # 未啟用功能
-            date="2024.07"
+            route="birthday.index",
+            description="每年生日",
+            enabled=True,
+            date="xxxx.06.26"
         ),
         BookmarkConfig(
             id="travel_log",
-            title="旅行記錄",
+            title="開發中",
             icon="🗺️",
             color="#45B7D1",
             route="travel.index", 
             description="足跡遍佈的美好時光",
             enabled=False,  # 未啟用功能
-            date="2024.08"
-        ),
-        BookmarkConfig(
-            id="music_box",
-            title="音樂盒",
-            icon="🎵",
-            color="#96CEB4",
-            route="music.index",
-            description="收藏喜愛的音樂回憶",
-            enabled=False,  # 未啟用功能
-            date="2024.09"
-        ),
-        BookmarkConfig(
-            id="todo_list",
-            title="待辦事項",
-            icon="✅",
-            color="#FFEAA7",
-            route="todo.index",
-            description="規劃未來的美好",
-            enabled=False,  # 未啟用功能
-            date="2024.10"
-        ),
-        BookmarkConfig(
-            id="recipe_book", 
-            title="食譜收藏",
-            icon="🍳",
-            color="#DDA0DD",
-            route="recipe.index",
-            description="美味料理的秘密",
-            enabled=False,  # 未啟用功能
-            date="2024.11"
+            date=" "
         )
     ]
     
