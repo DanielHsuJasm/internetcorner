@@ -14,6 +14,7 @@ def create_app(config_name=None):
     app = Flask(__name__, 
                 static_folder=os.path.join(os.getcwd(), 'static'),
                 template_folder=os.path.join(os.getcwd(), 'templates'))
+    
     # 選擇 config
     env = os.environ.get('FLASK_ENV', 'development')
     config_name = config_name or env
@@ -30,12 +31,19 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
 
     # 註冊藍圖
+    from .blueprints.home import bp as home_bp      # 新增：主畫面
+    from .blueprints.memory import bp as memory_bp  # 新增：回憶膠卷
     from .blueprints.upload import bp as upload_bp
-    from .blueprints.view import bp as view_bp
     from .blueprints.delete import bp as delete_bp
+    
+    app.register_blueprint(home_bp)      # 主畫面作為根路由
+    app.register_blueprint(memory_bp)    # 回憶膠卷移到 /memory
     app.register_blueprint(upload_bp)
-    app.register_blueprint(view_bp)
     app.register_blueprint(delete_bp)
+
+    # 移除舊的 view 藍圖，因為功能已分離到 home 和 memory
+    # from .blueprints.view import bp as view_bp
+    # app.register_blueprint(view_bp)
 
     # 全域錯誤處理
     @app.errorhandler(404)

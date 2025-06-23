@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternetCorner - 數位回憶書</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Canvas 星空背景 -->
+    <canvas id="star-canvas"></canvas>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 網站標題 -->
+        <div class="site-title">
+            <h1>InternetCorner</h1>
+            <p>我的數位回憶收藏</p>
+        </div>
+
+        <!-- 書本容器 -->
+        <div class="book-container">
+            <!-- 書本本體 -->
+            <div class="book">
+                <div class="book-cover">
+                    <h2>數位回憶書</h2>
+                    <p class="subtitle">Digital Memory Book</p>
+                    <div class="book-decoration">
+                        <div class="golden-line"></div>
+                        <div class="corner-ornament">✦</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 書籤容器 -->
+            <div class="bookmarks-container">
+                {% for bookmark in bookmarks %}
+                <div class="bookmark" 
+                     data-bookmark-id="{{ bookmark.id }}"
+                     data-enabled="{{ bookmark.enabled|lower }}"
+                     onclick="{% if bookmark.enabled %}navigateToPage('{{ url_for(bookmark.route) }}'){% else %}showComingSoon('{{ bookmark.title }}'){% endif %}">
+                    <div class="bookmark-tab bookmark-color-{{ loop.index }}">
+                        <div class="bookmark-icon">{{ bookmark.icon }}</div>
+                        <div class="bookmark-date">{{ bookmark.date }}</div>
+                        <div class="bookmark-title">{{ bookmark.title }}</div>
+                        {% if not bookmark.enabled %}
+                        <div class="coming-soon-badge">敬請期待</div>
+                        {% endif %}
+                    </div>
+                    <div class="bookmark-tooltip">
+                        <div class="tooltip-title">{{ bookmark.title }}</div>
+                        <div class="tooltip-description">{{ bookmark.description }}</div>
+                        {% if not bookmark.enabled %}
+                        <div class="tooltip-status">🚧 開發中...</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 版本資訊 -->
+        <div class="version-info">
+            <p>Version 1.0.0 - Built with ❤️</p>
+        </div>
+    </div>
+
+    <!-- 即將推出提示框 -->
+    <div id="coming-soon-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">🚧</div>
+            <h3 id="feature-name">功能開發中</h3>
+            <p>這個功能正在努力開發中，請耐心等待！</p>
+            <div class="modal-buttons">
+                <button onclick="closeComingSoonModal()">好的</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 載入腳本 -->
+    <script src="{{ url_for('static', filename='js/star-background.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>

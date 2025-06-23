@@ -10,4 +10,4 @@ def delete(photo_id):
         pass
     else:
         flash('找不到該圖片', 'error')
-    return redirect(url_for('view.index'))
+    return redirect(url_for('memory.index'))  # 修改：重定向到回憶膠卷頁面
