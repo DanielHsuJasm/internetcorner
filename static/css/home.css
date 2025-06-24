@@ -129,10 +129,8 @@ body::before {
 .book-container {
     position: relative;
     margin-bottom: 2rem;
-    /* 🔧 修復：移除 overflow hidden，改用其他方法隱藏書籤 */
     overflow: visible;
     border-radius: 8px;
-    /* 🔧 不再限制寬高，讓書籤可以存在 */
     width: 480px;
     height: 448px;
 }
@@ -144,6 +142,7 @@ body::before {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
     z-index: 5;
+    border-radius: 8px; /* 🔧 修改：書本圓角 */
 }
 
 .book:hover {
@@ -156,7 +155,7 @@ body::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, var(--book-color) 0%, var(--book-border) 100%);
-    border-radius: 8px;
+    border-radius: 8px; /* 🔧 修改：書本封面圓角 */
     border: 3px solid var(--book-border);
     box-shadow: 
         0 8px 25px rgba(0, 0, 0, 0.3),
@@ -228,24 +227,24 @@ body::before {
     50% { transform: rotate(180deg); }
 }
 
-/* ===== 全新書籤系統 ===== */
+/* ===== 全新書籤系統 - 從右側滑出 ===== */
 .bookmarks-container {
     position: absolute;
     top: 80px;
-    right: -190px; /* 🔧 修復：調整隱藏距離，讓書籤部分可見 */
+    right: -180px; /* 🔧 修改：調整初始位置 */
     width: 250px;
     height: 320px;
-    z-index: 2; /* 🔧 在書本之下 */
+    z-index: 2;
     display: flex;
     flex-direction: column;
     gap: 8px;
     transition: right 0.4s ease;
-    pointer-events: auto; /* 🔧 確保可以交互 */
+    pointer-events: auto;
 }
 
-/* 🔧 書本懸停時，書籤容器稍微露出更多 */
+/* 🔧 書本懸停時，書籤容器向左滑出（露出更多） */
 .book-container:hover .bookmarks-container {
-    right: -170px;
+    right: -120px; /* 從書的右邊界向左露出更多 */
 }
 
 /* ===== 書籤基本結構 ===== */
@@ -256,26 +255,26 @@ body::before {
     cursor: pointer;
     transition: transform 0.3s ease, opacity 0.3s ease;
     transform: translateX(0);
-    opacity: 0.4; /* 🔧 提高初始可見度 */
-    pointer-events: auto; /* 🔧 確保可點擊 */
+    opacity: 0.7; /* 初始半透明 */
+    pointer-events: auto;
 }
 
 .bookmark:hover {
-    transform: translateX(-60px); /* 🔧 懸停時向左移動更多，完全露出 */
+    transform: translateX(-40px); /* 🔧 懸停時向左露出更多 */
     opacity: 1;
     z-index: 10;
 }
 
-/* ===== 書籤標籤設計 ===== */
+/* ===== 書籤標籤設計 - 圓角處理 ===== */
 .bookmark-tab {
     width: 100%;
     height: 100%;
-    border-radius: 25px 0 0 25px; /* 🔧 修改：回到左圓右方形（因為回到右側） */
+    border-radius: 15px; /* 🔧 修改：全圓角設計 */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 15px 8px 20px; /* 🔧 修改：左側大padding，右側小padding */
-    box-shadow: -3px 2px 15px rgba(0, 0, 0, 0.4); /* 🔧 修改：陰影在左側 */
+    padding: 8px 20px 8px 15px; /* 🔧 修改：調整內邊距 */
+    box-shadow: -3px 2px 15px rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
@@ -320,8 +319,8 @@ body::before {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    opacity: 0;
-    transform: translateX(-20px);
+    opacity: 1; /* 🔧 修改：預設顯示文字 */
+    transform: translateX(0);
     transition: all 0.3s ease 0.1s;
     white-space: nowrap;
     max-width: 140px;
@@ -364,7 +363,7 @@ body::before {
     filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9));
 }
 
-/* ===== 即將推出徽章 ===== */
+/* ===== 即將推出徽章 - 圓角處理 ===== */
 .coming-soon-badge {
     position: absolute;
     top: -8px;
@@ -373,7 +372,7 @@ body::before {
     color: white;
     font-size: 0.6rem;
     padding: 3px 8px;
-    border-radius: 10px;
+    border-radius: 15px; /* 🔧 修改：圓角徽章 */
     font-weight: bold;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
     z-index: 5;
@@ -419,7 +418,7 @@ body::before {
     background: linear-gradient(145deg, #ffffff, #f8f9fa);
     margin: 0;
     padding: 2.5rem;
-    border-radius: 20px;
+    border-radius: 20px; /* 🔧 修改：模態框圓角 */
     width: 90%;
     max-width: 450px;
     min-width: 320px;
@@ -471,7 +470,7 @@ body::before {
 .modal-buttons button {
     padding: 1rem 2.5rem;
     border: none;
-    border-radius: 25px;
+    border-radius: 25px; /* 🔧 修改：圓角按鈕 */
     cursor: pointer;
     font-weight: bold;
     font-size: 1rem;
@@ -586,7 +585,7 @@ body.modal-open {
     margin: 0;
     padding: 5px 15px;
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
+    border-radius: 15px; /* 🔧 修改：圓角版本資訊 */
     backdrop-filter: blur(5px);
 }
 
@@ -610,25 +609,24 @@ body.modal-open {
     }
     
     .bookmarks-container {
-        right: -100px; /* 🔧 平板版：平常狀態較多露出 */
+        right: -160px; /* 🔧 平板版：調整隱藏位置 */
         width: 200px;
         top: 60px;
         gap: 6px;
     }
     
     .book-container:hover .bookmarks-container {
-        right: -140px; /* 🔧 懸停時較少露出 */
+        right: -100px; /* 🔧 懸停時露出更多 */
     }
     
     .bookmark {
         height: 45px;
-        opacity: 1;
-        transform: translateX(-50px); /* 🔧 修改：平常狀態向左移動（較多露出） */
+        opacity: 0.8;
     }
     
     .bookmark:hover {
-        transform: translateX(0); /* 🔧 懸停時回到原位（較少露出） */
-        opacity: 0.7;
+        transform: translateX(-30px);
+        opacity: 1;
     }
     
     .bookmark-icon {
@@ -688,25 +686,24 @@ body.modal-open {
     }
     
     .bookmarks-container {
-        right: -80px; /* 🔧 手機版：平常狀態最多露出 */
+        right: -140px; /* 🔧 手機版：調整隱藏位置 */
         width: 180px;
         top: 50px;
         gap: 5px;
     }
     
     .book-container:hover .bookmarks-container {
-        right: -120px; /* 🔧 懸停時較少露出 */
+        right: -80px; /* 🔧 懸停時露出更多 */
     }
     
     .bookmark {
         height: 42px;
-        opacity: 1;
-        transform: translateX(-45px); /* 🔧 修改：平常狀態向左移動（較多露出） */
+        opacity: 0.9;
     }
     
     .bookmark:hover {
-        transform: translateX(0); /* 🔧 懸停時回到原位（較少露出） */
-        opacity: 0.7;
+        transform: translateX(-25px);
+        opacity: 1;
     }
     
     .bookmark-icon {
@@ -754,25 +751,19 @@ body.modal-open {
 /* ===== 觸摸設備優化 ===== */
 @media (hover: none) and (pointer: coarse) {
     .bookmark {
-        opacity: 1;
-        transform: translateX(-60px); /* 🔧 修改：平常狀態向左移動（較多露出） */
+        opacity: 0.8;
+        transform: translateX(-20px); /* 🔧 修改：觸摸設備預設露出更多 */
     }
     
     .bookmark:active,
     .bookmark.touch-active {
-        transform: translateX(0); /* 🔧 激活時回到原位（較少露出） */
-        opacity: 0.8;
+        transform: translateX(-40px); /* 🔧 激活時露出更多 */
+        opacity: 1;
         z-index: 10;
     }
     
-    .bookmark:active .bookmark-text,
-    .bookmark.touch-active .bookmark-text {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    
     .book-container:active .bookmarks-container {
-        right: -170px; /* 🔧 觸摸時較少露出 */
+        right: -100px; /* 🔧 觸摸時露出更多 */
     }
 }
 
@@ -780,7 +771,7 @@ body.modal-open {
 .bookmark:focus {
     outline: 2px solid var(--gold);
     outline-offset: 2px;
-    transform: translateX(-50px);
+    transform: translateX(-40px);
     opacity: 1;
     z-index: 10;
 }
@@ -811,14 +802,33 @@ body.modal-open {
     }
 }
 
-/* ===== 確保清潔的結構 ===== */
-.bookmark-tab::before,
-.bookmark-tab::after,
-.bookmark::before,
-.bookmark::after {
-    display: none;
+/* ===== 書籤特殊狀態 ===== */
+.bookmark-tab::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -8px; /* 🔧 修改：從書內伸出的小標籤 */
+    width: 8px;
+    height: 20px;
+    background: inherit;
+    border-radius: 4px 0 0 4px; /* 🔧 修改：半圓角 */
+    transform: translateY(-50%);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
 }
 
+/* ===== 書籤從書中伸出效果 ===== */
+.bookmark-tab::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -3px;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0.1), transparent);
+    border-radius: 15px 0 0 15px; /* 🔧 修改：左側圓角，模擬從書中伸出 */
+}
+
+/* ===== 確保清潔的結構 ===== */
 .bookmark-title,
 .bookmark-date,
 .bookmark-icon {
