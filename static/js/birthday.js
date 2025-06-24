@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let isCardOpen = false;
 
         birthdayCard.addEventListener('click', function(e) {
-            if (!isCardOpen && e.target === birthdayCard || e.target.closest('.birthday-card')) {
+            if (!isCardOpen && (e.target === birthdayCard || e.target.closest('.birthday-card'))) {
                 openBirthdayCard();
             } else if (isCardOpen && e.target === birthdayCard) {
                 closeBirthdayCard();
@@ -348,3 +348,251 @@ document.addEventListener('DOMContentLoaded', function() {
             photo.addEventListener('touchend', function() {
                 clearTimeout(touchTimer);
             });
+            
+            // 雙擊支援
+            let lastTap = 0;
+            photo.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < 500 && tapLength > 0) {
+                    // 雙擊事件
+                    e.preventDefault();
+                    showPhotoModal(this);
+                }
+                lastTap = currentTime;
+            });
+        });
+    }
+
+    // 年份篩選增強
+    const yearFilters = document.querySelectorAll('.year-filter');
+    yearFilters.forEach(filter => {
+        filter.addEventListener('click', function(e) {
+            // 移除所有 active 類
+            yearFilters.forEach(f => f.classList.remove('active'));
+            
+            // 添加 active 類到當前點擊的篩選器
+            this.classList.add('active');
+            
+            // 可以添加載入動畫
+            showLoadingAnimation();
+            
+            // 延遲跳轉以顯示動畫
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 200);
+            
+            e.preventDefault();
+        });
+    });
+
+    // 載入動畫
+    function showLoadingAnimation() {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 105, 180, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        `;
+        loadingDiv.innerHTML = '<span>🎂</span> 載入中...';
+        document.body.appendChild(loadingDiv);
+        
+        setTimeout(() => {
+            if (document.body.contains(loadingDiv)) {
+                document.body.removeChild(loadingDiv);
+            }
+        }, 3000);
+    }
+
+    // 生日特效
+    function createBirthdayEffect() {
+        // 創建生日特效（例如飄落的彩色紙屑）
+        const colors = ['#FF69B4', '#FFB6C1', '#FFD700', '#FF4500', '#32CD32', '#1E90FF'];
+        
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.textContent = ['🎉', '🎊', '🎈', '🌟', '✨'][Math.floor(Math.random() * 5)];
+                confetti.style.cssText = `
+                    position: fixed;
+                    top: -50px;
+                    left: ${Math.random() * 100}%;
+                    font-size: ${Math.random() * 20 + 15}px;
+                    z-index: 1000;
+                    pointer-events: none;
+                    animation: confetti-fall 3s linear forwards;
+                `;
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    if (document.body.contains(confetti)) {
+                        document.body.removeChild(confetti);
+                    }
+                }, 3000);
+            }, i * 100);
+        }
+    }
+
+    // 添加彩色紙屑動畫 CSS
+    if (!document.querySelector('#confetti-styles')) {
+        const style = document.createElement('style');
+        style.id = 'confetti-styles';
+        style.textContent = `
+            @keyframes confetti-fall {
+                0% {
+                    transform: translateY(-50px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 生日祝福動態效果
+    function animateBirthdayMessage() {
+        const messages = [
+            '🎂 生日快樂！',
+            '🎉 願所有美好都如期而至！',
+            '🌟 祝你天天開心！',
+            '🎈 歲歲平安，年年有今日！'
+        ];
+        
+        let messageIndex = 0;
+        const messageElement = document.querySelector('.birthday-message h3');
+        
+        if (messageElement) {
+            setInterval(() => {
+                messageElement.style.opacity = '0';
+                setTimeout(() => {
+                    messageElement.textContent = messages[messageIndex];
+                    messageElement.style.opacity = '1';
+                    messageIndex = (messageIndex + 1) % messages.length;
+                }, 300);
+            }, 4000);
+        }
+    }
+
+    // 生日音效（可選）
+    function playBirthdaySound() {
+        try {
+            // 創建簡單的生日音效
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 生日快樂歌的簡單旋律
+            const notes = [
+                { frequency: 261.63, duration: 0.5 }, // C
+                { frequency: 261.63, duration: 0.25 }, // C
+                { frequency: 293.66, duration: 0.75 }, // D
+                { frequency: 261.63, duration: 0.75 }, // C
+                { frequency: 349.23, duration: 0.75 }, // F
+                { frequency: 329.63, duration: 1.5 }   // E
+            ];
+            
+            let currentTime = audioContext.currentTime;
+            
+            notes.forEach(note => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                osc.frequency.setValueAtTime(note.frequency, currentTime);
+                gain.gain.setValueAtTime(0.1, currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
+                
+                osc.start(currentTime);
+                osc.stop(currentTime + note.duration);
+                
+                currentTime += note.duration;
+            });
+        } catch (error) {
+            console.log('音效播放失敗:', error);
+        }
+    }
+
+    // 初始化特效
+    function initBirthdayEffects() {
+        // 如果是生日月份，自動播放特效
+        const currentMonth = new Date().getMonth() + 1;
+        const currentDay = new Date().getDate();
+        
+        // 假設生日是6月26日（可以根據實際情況修改）
+        if (currentMonth === 6 && currentDay === 26) {
+            setTimeout(() => {
+                createBirthdayEffect();
+                playBirthdaySound();
+                showNotification('🎉 今天是你的生日！生日快樂！', 'success');
+            }, 1000);
+        }
+        
+        // 啟動動態祝福消息
+        animateBirthdayMessage();
+    }
+
+    // 添加快捷鍵支援
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + U 快速上傳
+        if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+            e.preventDefault();
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+        
+        // Ctrl/Cmd + E 觸發生日特效
+        if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+            e.preventDefault();
+            createBirthdayEffect();
+        }
+    });
+
+    // 性能優化：懶加載圖片
+    function setupLazyLoading() {
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            imageObserver.unobserve(img);
+                        }
+                    }
+                });
+            });
+
+            const lazyImages = document.querySelectorAll('img[data-src]');
+            lazyImages.forEach(img => imageObserver.observe(img));
+        }
+    }
+
+    // 初始化所有功能
+    initBirthdayEffects();
+    setupLazyLoading();
+
+    console.log('🎂 生日頁面已完全載入！');
+    console.log('💡 可用快捷鍵: Ctrl+U (上傳), Ctrl+E (特效)');
+});

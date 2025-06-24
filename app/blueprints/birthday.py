@@ -28,11 +28,15 @@ def index():
     if selected_year:
         photos = get_birthday_photos_by_year(selected_year)
     
+    # 🔧 添加當前年份變數
+    current_year = datetime.now().year
+    
     return render_template('birthday/index.html', 
                          photos=photos, 
                          years=years, 
                          selected_year=selected_year,
-                         stats=stats)
+                         stats=stats,
+                         current_year=current_year)  # 🔧 傳遞給模板
 
 @bp.route('/upload', methods=['POST'])
 def upload():
@@ -93,8 +97,12 @@ def year_view(year):
     years = get_birthday_years()
     stats = get_birthday_stats()
     
+    # 🔧 添加當前年份變數
+    current_year = datetime.now().year
+    
     return render_template('birthday/index.html', 
                          photos=photos, 
                          years=years, 
                          selected_year=year,
-                         stats=stats)
+                         stats=stats,
+                         current_year=current_year)  # 🔧 傳遞給模板

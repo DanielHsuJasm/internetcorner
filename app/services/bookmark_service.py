@@ -50,9 +50,9 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             title="生日",
             icon="🎂",
             color="#4ECDC4", 
-            route="birthday.index",
+            route="birthday.index",  # 🎂 修正路由名稱
             description=birthday_description,
-            enabled=True,
+            enabled=True,  # 🎂 啟用生日功能
             date="xxxx.06.26"
         ),
         BookmarkConfig(
