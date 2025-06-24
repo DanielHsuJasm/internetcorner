@@ -1,6 +1,6 @@
 /**
-     * 清除高亮/**
- * 全新設計的 home.js - 完整版書籤系統
+ * 🔧 完整修復版 home.js - 書籤往右滑出系統
+ * 主要修復：書籤從書的右邊往右滑出，預設幾乎完全隱藏，文字不被書本擋住
  */
 
 class BookmarkSystem {
@@ -42,7 +42,8 @@ class BookmarkSystem {
                 return;
             }
             
-            // 初始化各個功能
+            // 🔧 確保書籤預設狀態和層級正確
+            this.setupBookmarkInitialStates();
             this.setupBookmarkStructure();
             this.setupBookmarkEvents();
             this.setupModalSystem();
@@ -52,11 +53,51 @@ class BookmarkSystem {
             this.setupSoundSystem();
             
             this.isInitialized = true;
-            console.log('📚 書籤系統初始化完成！');
+            console.log('📚 書籤系統初始化完成！(完整修復版)');
             
         } catch (error) {
             console.error('📚 書籤系統初始化失敗:', error);
         }
+    }
+    
+    /**
+     * 🔧 設置書籤預設狀態和層級
+     */
+    setupBookmarkInitialStates() {
+        // 確保書籤容器預設位置正確
+        if (this.bookmarksContainer) {
+            this.bookmarksContainer.style.right = '-150px'; // 隱藏大部分
+            this.bookmarksContainer.style.zIndex = '10'; // 容器層級
+        }
+        
+        // 確保所有書籤預設狀態和層級正確
+        this.bookmarks.forEach((bookmark, index) => {
+            const text = bookmark.querySelector('.bookmark-text');
+            const icon = bookmark.querySelector('.bookmark-icon');
+            
+            if (text) {
+                text.style.opacity = '0';
+                text.style.transform = 'translateX(-10px)';
+                text.style.transition = 'all 0.3s ease 0.1s';
+                text.style.zIndex = '10000'; // 🔧 文字層級
+                text.style.position = 'relative'; // 🔧 確保 z-index 生效
+            }
+            
+            if (icon) {
+                icon.style.opacity = '1';
+                icon.style.transform = 'scale(1)';
+                icon.style.zIndex = '9999'; // 🔧 圖標層級
+                icon.style.position = 'relative'; // 🔧 確保 z-index 生效
+            }
+            
+            // 🔧 書籤基本層級和位置
+            bookmark.style.transform = 'translateX(0)';
+            bookmark.style.opacity = '0.9';
+            bookmark.style.zIndex = '11'; // 🔧 書籤基本層級
+            bookmark.style.position = 'relative'; // 🔧 確保 z-index 生效
+            
+            console.log(`📑 書籤 ${index + 1} 預設狀態和層級已設置`);
+        });
     }
     
     /**
@@ -104,7 +145,7 @@ class BookmarkSystem {
     }
     
     /**
-     * 設置書籤事件
+     * 🔧 設置書籤事件
      */
     setupBookmarkEvents() {
         this.bookmarks.forEach((bookmark) => {
@@ -116,7 +157,7 @@ class BookmarkSystem {
                 this.handleBookmarkClick(bookmark, isEnabled);
             });
             
-            // 懸停事件
+            // 🔧 懸停事件 - 往右滑出並顯示文字，設置最高層級
             bookmark.addEventListener('mouseenter', () => {
                 this.handleBookmarkHover(bookmark, true);
                 if (this.soundSystem) {
@@ -128,11 +169,28 @@ class BookmarkSystem {
                 this.handleBookmarkHover(bookmark, false);
             });
             
-            // 觸摸事件
+            // 🔧 觸摸事件 - 含層級處理
             let touchTimeout;
             bookmark.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 bookmark.classList.add('touch-active');
+                this.handleBookmarkHover(bookmark, true);
+                
+                // 🔧 觸摸時立即設置最高層級
+                bookmark.style.zIndex = '9999';
+                bookmark.style.position = 'relative';
+                
+                const text = bookmark.querySelector('.bookmark-text');
+                if (text) {
+                    text.style.zIndex = '10001';
+                    text.style.position = 'relative';
+                }
+                
+                const icon = bookmark.querySelector('.bookmark-icon');
+                if (icon) {
+                    icon.style.zIndex = '10000';
+                    icon.style.position = 'relative';
+                }
                 
                 // 觸摸震動反饋
                 if (navigator.vibrate) {
@@ -142,6 +200,7 @@ class BookmarkSystem {
                 clearTimeout(touchTimeout);
                 touchTimeout = setTimeout(() => {
                     bookmark.classList.remove('touch-active');
+                    this.handleBookmarkHover(bookmark, false);
                 }, 3000);
             });
             
@@ -158,7 +217,7 @@ class BookmarkSystem {
             });
         });
         
-        // 書本懸停事件
+        // 🔧 書本懸停事件 - 書籤容器從右邊往右移
         if (this.bookContainer) {
             this.bookContainer.addEventListener('mouseenter', () => {
                 this.handleBookHover(true);
@@ -169,11 +228,11 @@ class BookmarkSystem {
             });
         }
         
-        console.log('📑 書籤事件已設置');
+        console.log('📑 書籤事件已設置 (完整修復版)');
     }
     
     /**
-     * 處理書本懸停
+     * 🔧 處理書本懸停
      */
     handleBookHover(isHovering) {
         const book = this.bookContainer.querySelector('.book');
@@ -183,10 +242,18 @@ class BookmarkSystem {
             if (book) {
                 book.style.transform = 'translateY(-5px) scale(1.02)';
             }
+            // 🔧 書籤容器從右邊往右移露出更多
+            if (this.bookmarksContainer) {
+                this.bookmarksContainer.style.right = '-80px';
+            }
         } else {
             // 恢復書本狀態
             if (book) {
                 book.style.transform = '';
+            }
+            // 🔧 書籤容器回到隱藏狀態
+            if (this.bookmarksContainer) {
+                this.bookmarksContainer.style.right = '-150px';
             }
         }
     }
@@ -214,12 +281,12 @@ class BookmarkSystem {
             this.showComingSoon(title);
         }
         
-        // 添加點擊動畫
-        bookmark.style.transform = 'translateX(0) scale(0.95)'; /* 🔧 點擊時縮回 */
+        // 🔧 點擊動畫 - 快速往右再恢復
+        bookmark.style.transform = 'translateX(55px) scale(0.95)';
         bookmark.style.transition = 'transform 0.15s ease';
         
         setTimeout(() => {
-            bookmark.style.transform = 'translateX(-60px)'; /* 🔧 恢復到平常展開狀態 */
+            bookmark.style.transform = '';
             bookmark.style.transition = '';
         }, 150);
         
@@ -227,40 +294,49 @@ class BookmarkSystem {
     }
     
     /**
-     * 處理書籤懸停
+     * 🔧 最關鍵修復：處理書籤懸停 - 確保層級最高
      */
     handleBookmarkHover(bookmark, isHovering) {
         const text = bookmark.querySelector('.bookmark-text');
         const icon = bookmark.querySelector('.bookmark-icon');
         
         if (isHovering) {
-            // 懸停進入 - 隱藏文字
+            // 🔧 懸停進入 - 設置最高層級
+            bookmark.style.transform = 'translateX(50px)';
+            bookmark.style.opacity = '1';
+            bookmark.style.zIndex = '9999'; /* 🔧 最高層級 */
+            bookmark.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
+            
             if (text) {
-                text.style.opacity = '0';
-                text.style.transform = 'translateX(20px)';
+                text.style.opacity = '1';
+                text.style.transform = 'translateX(0)';
+                text.style.zIndex = '10001'; /* 🔧 文字層級最高 */
+                text.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
             }
             if (icon) {
                 icon.style.transform = 'scale(1.1)';
                 icon.style.filter = 'drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9))';
+                icon.style.zIndex = '10000'; /* 🔧 圖標高層級 */
+                icon.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
             }
             
-            // 降低透明度
-            bookmark.style.opacity = '0.7';
-            bookmark.style.zIndex = '10';
+            console.log('📑 書籤懸停：層級已設為最高', bookmark.dataset.bookmarkId);
         } else {
-            // 懸停離開 - 顯示文字
+            // 🔧 懸停離開 - 回到正常層級
+            bookmark.style.transform = 'translateX(0)';
+            bookmark.style.opacity = '0.9';
+            bookmark.style.zIndex = '11'; /* 🔧 回到正常層級 */
+            
             if (text) {
-                text.style.opacity = '1';
-                text.style.transform = 'translateX(0)';
+                text.style.opacity = '0';
+                text.style.transform = 'translateX(-10px)';
+                text.style.zIndex = '10000'; /* 🔧 回到正常層級 */
             }
             if (icon) {
                 icon.style.transform = '';
                 icon.style.filter = '';
+                icon.style.zIndex = '9999'; /* 🔧 回到正常層級 */
             }
-            
-            // 恢復透明度
-            bookmark.style.opacity = '1';
-            bookmark.style.zIndex = '';
         }
     }
     
@@ -302,7 +378,7 @@ class BookmarkSystem {
     }
     
     /**
-     * 設置鍵盤導航
+     * 🔧 設置鍵盤導航
      */
     setupKeyboardNavigation() {
         let currentIndex = -1;
@@ -359,48 +435,63 @@ class BookmarkSystem {
     }
     
     /**
-     * 高亮顯示書籤
+     * 🔧 高亮顯示書籤 - 確保層級最高
      */
     highlightBookmark(bookmark) {
         // 清除其他高亮
         this.clearHighlight();
         
-        // 高亮當前書籤（縮回狀態）
+        // 🔧 高亮當前書籤（最高層級）
         bookmark.style.outline = '2px solid var(--gold)';
         bookmark.style.outlineOffset = '2px';
-        bookmark.style.transform = 'translateX(0)'; /* 🔧 鍵盤導航時縮回 */
+        bookmark.style.transform = 'translateX(50px)';
         bookmark.style.opacity = '1';
-        bookmark.style.zIndex = '10';
+        bookmark.style.zIndex = '9999'; /* 🔧 最高層級 */
+        bookmark.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
         
-        // 隱藏文字
+        // 顯示文字並設置最高層級
         const text = bookmark.querySelector('.bookmark-text');
         if (text) {
-            text.style.opacity = '0';
-            text.style.transform = 'translateX(20px)';
+            text.style.opacity = '1';
+            text.style.transform = 'translateX(0)';
+            text.style.zIndex = '10001'; /* 🔧 文字層級最高 */
+            text.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
+        }
+        
+        const icon = bookmark.querySelector('.bookmark-icon');
+        if (icon) {
+            icon.style.zIndex = '10000'; /* 🔧 圖標高層級 */
+            icon.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
         }
     }
     
     /**
-     * 清除高亮
+     * 🔧 清除高亮 - 恢復正常層級
      */
     clearHighlight() {
         this.bookmarks.forEach(bookmark => {
             bookmark.style.outline = '';
             bookmark.style.outlineOffset = '';
-            bookmark.style.transform = 'translateX(-60px)'; /* 🔧 恢復到平常展開狀態（向左移動） */
-            bookmark.style.opacity = '1';
-            bookmark.style.zIndex = '';
+            bookmark.style.transform = 'translateX(0)';
+            bookmark.style.opacity = '0.9';
+            bookmark.style.zIndex = '11'; /* 🔧 回到正常層級 */
             
             const text = bookmark.querySelector('.bookmark-text');
             if (text) {
-                text.style.opacity = '1'; /* 🔧 恢復顯示文字 */
-                text.style.transform = 'translateX(0)';
+                text.style.opacity = '0';
+                text.style.transform = 'translateX(-10px)';
+                text.style.zIndex = '10000'; /* 🔧 回到正常層級 */
+            }
+            
+            const icon = bookmark.querySelector('.bookmark-icon');
+            if (icon) {
+                icon.style.zIndex = '9999'; /* 🔧 回到正常層級 */
             }
         });
     }
     
     /**
-     * 設置觸摸支持
+     * 🔧 設置觸摸支持（含層級處理）
      */
     setupTouchSupport() {
         if ('ontouchstart' in window) {
@@ -424,27 +515,27 @@ class BookmarkSystem {
                 const diffX = touchStartX - touchEndX;
                 const diffY = touchStartY - touchEndY;
                 
-                // 檢測左滑手勢（隱藏書籤）
-                if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50) {
-                    this.handleSwipeLeft();
-                }
-                // 檢測右滑手勢（顯示書籤）
-                else if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
+                // 🔧 檢測右滑手勢（顯示書籤）
+                if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
                     this.handleSwipeRight();
+                }
+                // 檢測左滑手勢（隱藏書籤）
+                else if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50) {
+                    this.handleSwipeLeft();
                 }
             });
             
-            console.log('👆 觸摸支持已設置');
+            console.log('👆 觸摸支持已設置（含層級處理）');
         }
     }
     
     /**
-     * 處理左滑手勢
+     * 🔧 處理右滑手勢
      */
-    handleSwipeLeft() {
-        // 左滑時隱藏書籤更多
+    handleSwipeRight() {
+        // 右滑時顯示書籤
         this.bookmarksContainer.style.transition = 'right 0.3s ease';
-        this.bookmarksContainer.style.right = '-220px';
+        this.bookmarksContainer.style.right = '-60px';
         
         setTimeout(() => {
             this.bookmarksContainer.style.transition = '';
@@ -453,12 +544,12 @@ class BookmarkSystem {
     }
     
     /**
-     * 處理右滑手勢
+     * 🔧 處理左滑手勢
      */
-    handleSwipeRight() {
-        // 右滑時顯示書籤更多
+    handleSwipeLeft() {
+        // 左滑時完全隱藏書籤
         this.bookmarksContainer.style.transition = 'right 0.3s ease';
-        this.bookmarksContainer.style.right = '-80px';
+        this.bookmarksContainer.style.right = '-200px';
         
         setTimeout(() => {
             this.bookmarksContainer.style.transition = '';
@@ -1007,35 +1098,6 @@ class SoundSystem {
         }
     }
     
-    playNotificationSound() {
-        if (!this.enabled || !this.audioContext) return;
-        
-        try {
-            if (this.audioContext.state === 'suspended') {
-                this.audioContext.resume();
-            }
-            
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(600, this.audioContext.currentTime);
-            oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime + 0.1);
-            oscillator.frequency.setValueAtTime(600, this.audioContext.currentTime + 0.2);
-            
-            gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
-            gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime + 0.1);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
-            
-            oscillator.start(this.audioContext.currentTime);
-            oscillator.stop(this.audioContext.currentTime + 0.3);
-        } catch (e) {
-            // 靜默處理音效錯誤
-        }
-    }
-    
     setVolume(volume) {
         this.volume = Math.max(0, Math.min(1, volume));
     }
@@ -1060,293 +1122,16 @@ class SoundSystem {
     }
 }
 
-/**
- * 性能監控器
- */
-class PerformanceMonitor {
-    constructor() {
-        this.metrics = {
-            loadTime: 0,
-            domTime: 0,
-            firstPaint: 0,
-            firstContentfulPaint: 0,
-            interactions: 0,
-            errors: 0
-        };
-        this.init();
-    }
-    
-    init() {
-        this.measureLoadTimes();
-        this.setupInteractionTracking();
-        this.setupErrorTracking();
-        this.setupPerformanceObserver();
-    }
-    
-    measureLoadTimes() {
-        window.addEventListener('load', () => {
-            if (typeof performance !== 'undefined' && performance.timing) {
-                const timing = performance.timing;
-                this.metrics.loadTime = timing.loadEventEnd - timing.navigationStart;
-                this.metrics.domTime = timing.domContentLoadedEventEnd - timing.navigationStart;
-                
-                console.log(`📊 載入性能:`, {
-                    總載入時間: `${this.metrics.loadTime}ms`,
-                    DOM載入時間: `${this.metrics.domTime}ms`
-                });
-            }
-        });
-    }
-    
-    setupInteractionTracking() {
-        ['click', 'touchstart', 'keydown'].forEach(event => {
-            document.addEventListener(event, () => {
-                this.metrics.interactions++;
-            });
-        });
-    }
-    
-    setupErrorTracking() {
-        window.addEventListener('error', (e) => {
-            this.metrics.errors++;
-            console.error('💥 錯誤追蹤:', {
-                訊息: e.message,
-                檔案: e.filename,
-                行號: e.lineno,
-                欄號: e.colno
-            });
-        });
-        
-        window.addEventListener('unhandledrejection', (e) => {
-            this.metrics.errors++;
-            console.error('💥 Promise錯誤:', e.reason);
-        });
-    }
-    
-    setupPerformanceObserver() {
-        if ('PerformanceObserver' in window) {
-            try {
-                const observer = new PerformanceObserver((list) => {
-                    list.getEntries().forEach((entry) => {
-                        if (entry.name === 'first-paint') {
-                            this.metrics.firstPaint = entry.startTime;
-                        }
-                        if (entry.name === 'first-contentful-paint') {
-                            this.metrics.firstContentfulPaint = entry.startTime;
-                        }
-                    });
-                });
-                
-                observer.observe({ entryTypes: ['paint'] });
-            } catch (e) {
-                console.warn('性能觀察器不可用');
-            }
-        }
-    }
-    
-    getMetrics() {
-        return { ...this.metrics };
-    }
-    
-    report() {
-        console.log('📊 性能報告:', this.getMetrics());
-        return this.getMetrics();
-    }
-}
-
-/**
- * 錯誤邊界處理器
- */
-class ErrorBoundary {
-    constructor() {
-        this.errorCount = 0;
-        this.maxErrors = 5;
-        this.setupGlobalErrorHandling();
-    }
-    
-    setupGlobalErrorHandling() {
-        window.addEventListener('error', (e) => {
-            this.handleError(e.error || new Error(e.message), {
-                type: 'javascript',
-                source: e.filename,
-                line: e.lineno,
-                column: e.colno
-            });
-        });
-        
-        window.addEventListener('unhandledrejection', (e) => {
-            this.handleError(e.reason, {
-                type: 'promise',
-                source: 'unhandled promise rejection'
-            });
-        });
-    }
-    
-    handleError(error, context = {}) {
-        this.errorCount++;
-        
-        console.error('🚨 錯誤邊界捕獲:', {
-            錯誤: error.message || error,
-            堆疊: error.stack,
-            上下文: context,
-            錯誤計數: this.errorCount
-        });
-        
-        // 如果錯誤太多，顯示錯誤頁面
-        if (this.errorCount >= this.maxErrors) {
-            this.showErrorPage();
-        } else {
-            this.showErrorNotification(error, context);
-        }
-    }
-    
-    showErrorNotification(error, context) {
-        const notification = document.createElement('div');
-        notification.className = 'error-notification';
-        notification.innerHTML = `
-            <div class="error-content">
-                <strong>⚠️ 發生錯誤</strong>
-                <p>應用程式遇到問題，但仍可繼續使用。</p>
-                <button onclick="this.parentElement.parentElement.remove()">關閉</button>
-                <button onclick="location.reload()">重新載入</button>
-            </div>
-        `;
-        
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 71, 87, 0.95);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            z-index: 10000;
-            max-width: 350px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // 10秒後自動移除
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                document.body.removeChild(notification);
-            }
-        }, 10000);
-    }
-    
-    showErrorPage() {
-        const errorPage = document.createElement('div');
-        errorPage.className = 'error-page';
-        errorPage.innerHTML = `
-            <div class="error-container">
-                <h1>😵 糟糕！出了點問題</h1>
-                <p>應用程式遇到多個錯誤，建議重新載入頁面。</p>
-                <div class="error-actions">
-                    <button onclick="location.reload()" class="primary-button">重新載入</button>
-                    <button onclick="history.back()" class="secondary-button">返回上頁</button>
-                </div>
-                <details>
-                    <summary>技術詳情</summary>
-                    <p>錯誤數量: ${this.errorCount}</p>
-                    <p>請檢查瀏覽器控制台獲取更多資訊</p>
-                </details>
-            </div>
-        `;
-        
-        errorPage.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            color: white;
-            font-family: system-ui, sans-serif;
-        `;
-        
-        const style = document.createElement('style');
-        style.textContent = `
-            .error-container {
-                text-align: center;
-                max-width: 500px;
-                padding: 2rem;
-            }
-            .error-container h1 {
-                font-size: 2.5rem;
-                margin-bottom: 1rem;
-            }
-            .error-container p {
-                font-size: 1.1rem;
-                margin-bottom: 2rem;
-                opacity: 0.9;
-            }
-            .error-actions {
-                display: flex;
-                gap: 1rem;
-                justify-content: center;
-                margin-bottom: 2rem;
-            }
-            .primary-button, .secondary-button {
-                padding: 0.8rem 2rem;
-                border: none;
-                border-radius: 25px;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: transform 0.2s ease;
-            }
-            .primary-button {
-                background: #4CAF50;
-                color: white;
-            }
-            .secondary-button {
-                background: rgba(255,255,255,0.2);
-                color: white;
-            }
-            .primary-button:hover, .secondary-button:hover {
-                transform: translateY(-2px);
-            }
-            details {
-                margin-top: 2rem;
-                text-align: left;
-            }
-            summary {
-                cursor: pointer;
-                font-weight: bold;
-            }
-        `;
-        
-        document.head.appendChild(style);
-        document.body.appendChild(errorPage);
-    }
-    
-    reset() {
-        this.errorCount = 0;
-    }
-}
-
 // ===== 主程序入口 =====
 
 // 全域變數
 let bookmarkSystem = null;
-let performanceMonitor = null;
-let errorBoundary = null;
 
 // 初始化所有系統
 function initializeApp() {
     console.log('🚀 開始初始化 InternetCorner 系統...');
     
     try {
-        // 初始化錯誤邊界（最先初始化）
-        errorBoundary = new ErrorBoundary();
-        
-        // 初始化性能監控
-        performanceMonitor = new PerformanceMonitor();
-        
         // 初始化書籤系統
         bookmarkSystem = new BookmarkSystem();
         
@@ -1359,16 +1144,13 @@ function initializeApp() {
             }
         }, { once: true });
         
-        console.log('✨ InternetCorner 系統初始化完成！');
+        console.log('✨ InternetCorner 系統初始化完成！(完整修復版)');
         
         // 標記頁面已準備就緒
         document.body.classList.add('app-ready');
         
     } catch (error) {
         console.error('❌ 系統初始化失敗:', error);
-        if (errorBoundary) {
-            errorBoundary.handleError(error, { phase: 'initialization' });
-        }
     }
 }
 
@@ -1383,8 +1165,6 @@ if (document.readyState === 'loading') {
 
 // 導出到全域作用域
 window.bookmarkSystem = bookmarkSystem;
-window.performanceMonitor = performanceMonitor;
-window.errorBoundary = errorBoundary;
 
 // 向後兼容的函數
 window.showComingSoon = function(featureName) {
@@ -1419,20 +1199,6 @@ window.reinitializeBookmarks = function() {
     }
 };
 
-window.getPerformanceReport = function() {
-    if (performanceMonitor) {
-        return performanceMonitor.report();
-    }
-    return { error: '性能監控器未初始化' };
-};
-
-window.resetErrorBoundary = function() {
-    if (errorBoundary) {
-        errorBoundary.reset();
-        console.log('🔄 錯誤邊界已重置');
-    }
-};
-
 window.toggleSound = function(enabled) {
     if (bookmarkSystem && bookmarkSystem.soundSystem) {
         if (enabled !== undefined) {
@@ -1461,10 +1227,6 @@ window.addEventListener('beforeunload', function() {
     if (bookmarkSystem) {
         bookmarkSystem.destroy();
     }
-    
-    if (performanceMonitor) {
-        performanceMonitor.report();
-    }
 });
 
 // ===== 頁面可見性處理 =====
@@ -1472,10 +1234,8 @@ window.addEventListener('beforeunload', function() {
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         console.log('👁️ 頁面已隱藏');
-        // 頁面隱藏時可以暫停某些動畫或功能
     } else {
         console.log('👁️ 頁面已顯示');
-        // 頁面重新顯示時恢復功能
         if (bookmarkSystem && !bookmarkSystem.isInitialized) {
             bookmarkSystem.reinitialize();
         }
@@ -1497,65 +1257,15 @@ if ('navigator' in window && 'onLine' in navigator) {
         if (bookmarkSystem) {
             bookmarkSystem.showNotification('網路連接已中斷', 'warning');
         }
-    });
-}
-
-// ===== 效能標記 =====
-
-if (typeof performance !== 'undefined' && performance.mark) {
-    performance.mark('home-js-complete');
-    
-    // 計算腳本載入時間
-    try {
-        performance.measure('home-js-load-time', 'home-js-loaded', 'home-js-complete');
-        const measures = performance.getEntriesByName('home-js-load-time');
-        if (measures.length > 0) {
-            console.log(`📊 home.js 執行時間: ${measures[0].duration.toFixed(2)}ms`);
-        }
-    } catch (e) {
-        // 忽略效能測量錯誤
     }
+    );
 }
 
-// ===== 開發模式調試工具 =====
-
-if (typeof window !== 'undefined') {
-    window.debugInfo = {
-        version: '1.0.0',
-        buildTime: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        screen: {
-            width: screen.width,
-            height: screen.height,
-            colorDepth: screen.colorDepth
-        },
-        viewport: {
-            width: window.innerWidth,
-            height: window.innerHeight
-        },
-        support: {
-            localStorage: 'localStorage' in window,
-            sessionStorage: 'sessionStorage' in window,
-            webAudio: 'AudioContext' in window || 'webkitAudioContext' in window,
-            touch: 'ontouchstart' in window,
-            serviceWorker: 'serviceWorker' in navigator
-        }
-    };
-    
-    window.showDebugInfo = function() {
-        console.log('🔍 調試資訊:', window.debugInfo);
-        return window.debugInfo;
-    };
-}
-
-console.log('📚 home.js 已完全載入');
+console.log('📚 home.js 已完全載入 (完整修復版)');
 console.log('💡 可用的全域指令:');
 console.log('  getBookmarkStatus() - 查看書籤系統狀態');
 console.log('  reinitializeBookmarks() - 重新初始化書籤');
-console.log('  getPerformanceReport() - 查看性能報告');
 console.log('  showComingSoon("功能名稱") - 顯示即將推出提示');
 console.log('  toggleSound() - 切換音效開關');
 console.log('  setSoundVolume(0.5) - 設定音效音量');
-console.log('  resetErrorBoundary() - 重置錯誤邊界');
-console.log('  showDebugInfo() - 顯示調試資訊');
-console.log('🎉 InternetCorner 準備就緒！');
+console.log('🎉 InternetCorner 準備就緒！(完整修復版 - 書籤往右滑出，文字不被擋住)');
