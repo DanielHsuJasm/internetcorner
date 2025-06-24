@@ -128,7 +128,7 @@ body::before {
 .book-container {
     position: relative;
     margin-bottom: 2rem;
-    padding-right: 80px; /* 增加右側空間 */
+    padding-right: 50px; /* 減少右側空間，讓書籤更靠近書本 */
     overflow: visible; /* 🔧 修復：確保書籤可見 */
 }
 
@@ -247,8 +247,8 @@ body::before {
 .bookmarks-container {
     position: absolute !important;
     top: 80px;
-    right: -35px !important;
-    z-index: 50 !important; /* 🔧 大幅提高層級 */
+    right: -170px !important; /* 🔧 將書籤更深入書本內部 */
+    z-index: 50 !important;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -256,15 +256,15 @@ body::before {
     pointer-events: auto !important;
 }
 
-/* 🔧 書籤基本樣式 - 修復圓頭向右 */
+/* 🔧 書籤基本樣式 - 大部分隱藏在書本內 */
 .bookmark {
     position: relative !important;
-    width: 250px !important;
+    width: 200px !important; /* 縮小書籤寬度 */
     height: 50px !important;
     cursor: pointer;
     transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
-    transform: translateX(200px) !important;
-    opacity: 0.15 !important;
+    transform: translateX(0px) !important; /* 🔧 書籤在正常位置 */
+    opacity: 0.3 !important; /* 🔧 稍微提高透明度讓用戶能看到 */
     display: flex !important;
     visibility: visible !important;
     z-index: 45 !important;
@@ -272,30 +272,30 @@ body::before {
 
 /* 🔧 懸停效果 - 完全顯示 */
 .bookmark:hover {
-    transform: translateX(0) !important;
+    transform: translateX(170px) !important; /* 🔧 對應容器位置的滑出距離 */
     opacity: 1 !important;
     z-index: 100 !important;
-    box-shadow: -8px 0 25px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 2px 0 25px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* 🔧 未啟用書籤的懸停效果 */
 .bookmark[data-enabled="false"]:hover {
-    transform: translateX(20px) !important;
+    transform: translateX(140px) !important; /* 🔧 未啟用的書籤露出更少 */
     opacity: 0.9 !important;
 }
 
-/* 🔧 書籤標籤 - 修復圓頭位置（左側圓角，右側直角） */
+/* 🔧 書籤標籤 - 圓角在右側 */
 .bookmark-tab {
     width: 100% !important;
     height: 100% !important;
-    border-radius: 0 25px 25px 0 !important; /* 🔧 修復：左側直角，右側圓角 */
+    border-radius: 0 25px 25px 0 !important; /* 🔧 左側直角，右側圓角 */
     position: relative !important;
-    box-shadow: 3px 2px 15px rgba(0, 0, 0, 0.4) !important; /* 🔧 陰影改到右側 */
+    box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.4) !important; /* 🔧 陰影在右側 */
     overflow: hidden !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    padding: 8px 15px 8px 55px !important; /* 🔧 修改padding，左邊大，右邊小 */
+    padding: 8px 55px 8px 15px !important; /* 🔧 右邊大，左邊小 */
     border: 2px solid rgba(255, 255, 255, 0.3) !important;
     background-color: #FF6B6B !important;
     background-image: none !important;
@@ -347,10 +347,10 @@ body::before {
     background-image: none !important;
 }
 
-/* 🔧 圖標定位 - 移到左側 */
+/* 🔧 圖標定位 - 在右側 */
 .bookmark-icon {
     position: absolute !important;
-    left: 15px !important; /* 🔧 修改：移到左側 */
+    right: 15px !important; /* 🔧 保持在右側 */
     top: 50% !important;
     transform: translateY(-50%) !important;
     font-size: 1.8rem !important;
@@ -366,7 +366,7 @@ body::before {
     filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9)) !important;
 }
 
-/* 🔧 文字內容 - 右側佈局 */
+/* 🔧 文字內容 - 左側佈局 */
 .bookmark-text {
     display: flex !important;
     flex-direction: column !important;
@@ -408,7 +408,7 @@ body::before {
 .coming-soon-badge {
     position: absolute !important;
     top: 3px !important;
-    right: 15px !important; /* 🔧 移到右側 */
+    right: 50px !important; /* 🔧 避免與圖標重疊 */
     background: rgba(255, 165, 0, 1) !important;
     color: white !important;
     font-size: 0.6rem !important;
@@ -437,35 +437,36 @@ body::before {
 /* 🔧 響應式修復 */
 @media (max-width: 768px) {
     .book-container {
-        padding-right: 70px !important;
+        padding-right: 40px !important;
     }
     
     .bookmarks-container {
         top: 65px !important;
-        right: -25px !important;
+        right: -140px !important; /* 🔧 手機版對應調整 */
         gap: 6px !important;
         z-index: 50 !important;
     }
     
     .bookmark {
-        width: 230px !important;
+        width: 180px !important;
         height: 45px !important;
-        transform: translateX(180px) !important;
+        transform: translateX(0px) !important;
+        opacity: 0.3 !important;
         z-index: 45 !important;
     }
     
     .bookmark:hover {
-        transform: translateX(0) !important;
+        transform: translateX(140px) !important; /* 🔧 手機版滑出距離 */
         z-index: 100 !important;
     }
     
     .bookmark[data-enabled="false"]:hover {
-        transform: translateX(15px) !important;
+        transform: translateX(110px) !important;
     }
     
     .bookmark-icon {
         font-size: 1.6rem !important;
-        left: 12px !important;
+        right: 12px !important;
         z-index: 60 !important;
     }
     
@@ -475,7 +476,7 @@ body::before {
     }
     
     .coming-soon-badge {
-        right: 12px !important;
+        right: 45px !important;
         font-size: 0.55rem !important;
         padding: 2px 6px !important;
         z-index: 65 !important;
@@ -484,35 +485,36 @@ body::before {
 
 @media (max-width: 480px) {
     .book-container {
-        padding-right: 60px !important;
+        padding-right: 30px !important;
     }
     
     .bookmarks-container {
         top: 55px !important;
-        right: -20px !important;
+        right: -120px !important; /* 🔧 小屏幕對應調整 */
         gap: 5px !important;
         z-index: 50 !important;
     }
     
     .bookmark {
-        width: 210px !important;
+        width: 160px !important;
         height: 40px !important;
-        transform: translateX(160px) !important;
+        transform: translateX(0px) !important;
+        opacity: 0.3 !important;
         z-index: 45 !important;
     }
     
     .bookmark:hover {
-        transform: translateX(0) !important;
+        transform: translateX(120px) !important; /* 🔧 小屏幕滑出距離 */
         z-index: 100 !important;
     }
     
     .bookmark[data-enabled="false"]:hover {
-        transform: translateX(10px) !important;
+        transform: translateX(90px) !important;
     }
     
     .bookmark-icon {
         font-size: 1.4rem !important;
-        left: 10px !important;
+        right: 10px !important;
         z-index: 60 !important;
     }
     
@@ -530,7 +532,7 @@ body::before {
     }
     
     .coming-soon-badge {
-        right: 10px !important;
+        right: 40px !important;
         font-size: 0.5rem !important;
         padding: 1px 5px !important;
         top: 2px !important;
@@ -541,21 +543,21 @@ body::before {
 /* 🔧 觸摸設備專用優化 */
 @media (hover: none) and (pointer: coarse) {
     .bookmark {
-        transform: translateX(190px) !important;
-        opacity: 0.25 !important;
+        transform: translateX(0px) !important;
+        opacity: 0.3 !important;
         z-index: 45 !important;
     }
     
     .bookmark:active,
     .bookmark:focus,
     .bookmark.touch-active {
-        transform: translateX(0) !important;
+        transform: translateX(140px) !important; /* 🔧 觸摸時滑出距離 */
         opacity: 1 !important;
         z-index: 100 !important;
     }
     
     .bookmark:active {
-        box-shadow: 3px 0 25px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 2px 0 25px rgba(0, 0, 0, 0.6) !important;
     }
 }
 
