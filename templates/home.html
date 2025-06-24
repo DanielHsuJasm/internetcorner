@@ -8,76 +8,427 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="InternetCorner - 我的數位回憶收藏，珍藏每一個美好瞬間">
+    <meta name="keywords" content="數位回憶,照片收藏,回憶膠卷,InternetCorner">
+    <meta name="author" content="InternetCorner">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="InternetCorner - 數位回憶書">
+    <meta property="og:description" content="我的數位回憶收藏，珍藏每一個美好瞬間">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" onerror="this.style.display='none'">
+    
+    <!-- Performance Optimization -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preload" href="{{ url_for('static', filename='css/home.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='js/home.js') }}" as="script">
 </head>
 <body>
     <!-- 主容器 -->
     <div class="main-container">
         <!-- 網站標題 -->
-        <div class="site-title">
+        <header class="site-title" role="banner">
             <h1>InternetCorner</h1>
             <p>我的數位回憶收藏</p>
-        </div>
+        </header>
 
-        <!-- 書本容器（確保只有一個） -->
-        <div class="book-container">
-            <!-- 書本本體 -->
-            <div class="book">
-                <div class="book-cover">
-                    <h2>數位回憶書</h2>
-                    <p class="subtitle">Digital Memory Book</p>
-                    <div class="book-decoration">
-                        <div class="golden-line"></div>
-                        <div class="corner-ornament">✦</div>
+        <!-- 書本主體區域 -->
+        <main class="book-section" role="main">
+            <!-- 書本容器 -->
+            <div class="book-container">
+                <!-- 書本本體 -->
+                <div class="book" role="button" tabindex="0" aria-label="數位回憶書">
+                    <div class="book-cover">
+                        <h2>數位回憶書</h2>
+                        <p class="subtitle">Digital Memory Book</p>
+                        <div class="book-decoration" aria-hidden="true">
+                            <div class="golden-line"></div>
+                            <div class="corner-ornament">✦</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 書籤容器（隱藏在書本內部） -->
-            <div class="bookmarks-container">
-                {% for bookmark in bookmarks %}
-                <div class="bookmark" 
-                     data-bookmark-id="{{ bookmark.id }}"
-                     data-enabled="{{ bookmark.enabled|lower }}"
-                     {% if bookmark.enabled and bookmark.route == 'memory.index' %}
-                        data-route="{{ url_for(bookmark.route) }}"
-                     {% else %}
-                        data-route="#"
-                     {% endif %}
-                     data-title="{{ bookmark.title|e }}">
-                    <div class="bookmark-tab bookmark-color-{{ loop.index }}">
-                        <div class="bookmark-icon">{{ bookmark.icon }}</div>
-                        <div class="bookmark-text">
-                            <div class="bookmark-title">{{ bookmark.title }}</div>
-                            <div class="bookmark-date">{{ bookmark.date }}</div>
+                <!-- 書籤容器 -->
+                <div class="bookmarks-container" role="navigation" aria-label="功能書籤">
+                    {% for bookmark in bookmarks %}
+                    <div class="bookmark bookmark-color-{{ loop.index }}" 
+                         data-bookmark-id="{{ bookmark.id }}"
+                         data-enabled="{{ bookmark.enabled|lower }}"
+                         {% if bookmark.enabled and bookmark.route != '#' %}
+                            data-route="{{ url_for(bookmark.route) if bookmark.route != '#' else '#' }}"
+                         {% else %}
+                            data-route="#"
+                         {% endif %}
+                         data-title="{{ bookmark.title|e }}"
+                         role="button"
+                         tabindex="0"
+                         aria-label="書籤: {{ bookmark.title }}{% if not bookmark.enabled %} (即將推出){% endif %}">
+                        
+                        <div class="bookmark-tab">
+                            <!-- 書籤文字內容 -->
+                            <div class="bookmark-text">
+                                <div class="bookmark-title">{{ bookmark.title }}</div>
+                                <div class="bookmark-date">{{ bookmark.date }}</div>
+                                {% if bookmark.description %}
+                                <div class="bookmark-description" aria-hidden="true">{{ bookmark.description }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- 書籤圖標 -->
+                            <div class="bookmark-icon" aria-hidden="true">{{ bookmark.icon }}</div>
                         </div>
+                        
+                        <!-- 即將推出徽章 -->
                         {% if not bookmark.enabled %}
-                        <div class="coming-soon-badge">敬請期待</div>
+                        <div class="coming-soon-badge" aria-label="即將推出">敬請期待</div>
                         {% endif %}
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
+        </main>
 
         <!-- 版本資訊 -->
-        <div class="version-info">
+        <footer class="version-info" role="contentinfo">
             <p>Version 1.0.0 - Built with ❤️</p>
-        </div>
+        </footer>
     </div>
 
-    <!-- 即將推出提示框 -->
-    <div id="coming-soon-modal" class="modal">
+    <!-- 即將推出模態框 -->
+    <div id="coming-soon-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title">
         <div class="modal-content">
-            <div class="modal-icon">🚧</div>
-            <h3 id="feature-name">功能開發中</h3>
-            <p>這個功能正在努力開發中，請耐心等待！</p>
+            <div class="modal-icon" aria-hidden="true">🚧</div>
+            <h3 id="modal-title">功能開發中</h3>
+            <p id="modal-description">這個功能正在努力開發中，請耐心等待！</p>
             <div class="modal-buttons">
-                <button onclick="closeComingSoonModal()">好的</button>
+                <button type="button" onclick="closeComingSoonModal()" aria-label="關閉對話框">
+                    好的
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 載入腳本 -->
-    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <!-- 載入遮罩（由JavaScript動態生成） -->
+    <!-- 通知容器（由JavaScript動態生成） -->
+
+    <!-- 無障礙跳轉連結 -->
+    <div class="skip-links" aria-hidden="true">
+        <a href="#main-content" class="skip-link">跳到主要內容</a>
+        <a href="#navigation" class="skip-link">跳到導航</a>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/home.js') }}" defer></script>
+    
+    <!-- 結構化數據 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "InternetCorner",
+        "description": "數位回憶收藏應用程式",
+        "url": "{{ request.url_root }}",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "TWD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "InternetCorner"
+        }
+    }
+    </script>
+
+    <!-- 頁面載入性能追蹤 -->
+    <script>
+        // 性能監控
+        window.addEventListener('load', function() {
+            if (typeof performance !== 'undefined' && performance.timing) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`📊 頁面載入時間: ${loadTime}ms`);
+                
+                // 標記關鍵性能指標
+                if (performance.mark) {
+                    performance.mark('page-loaded');
+                }
+            }
+        });
+
+        // 檢測關鍵渲染路徑
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof performance !== 'undefined' && performance.timing) {
+                const domTime = performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart;
+                console.log(`📊 DOM 載入時間: ${domTime}ms`);
+            }
+        });
+
+        // 錯誤追蹤
+        window.addEventListener('error', function(e) {
+            console.error('💥 頁面錯誤:', {
+                message: e.message,
+                source: e.filename,
+                line: e.lineno,
+                column: e.colno,
+                stack: e.error ? e.error.stack : null
+            });
+        });
+
+        // 未處理的Promise錯誤
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('💥 未處理的Promise錯誤:', e.reason);
+        });
+    </script>
+
+    <!-- 條件式載入優化腳本 -->
+    <script>
+        // 檢測瀏覽器能力並優化
+        (function() {
+            // 檢測是否支援 Intersection Observer
+            if (!('IntersectionObserver' in window)) {
+                console.log('📱 舊瀏覽器檢測：載入 polyfill...');
+                // 這裡可以載入 polyfill
+            }
+
+            // 檢測是否為觸摸設備
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                document.body.classList.add('touch-device');
+                console.log('👆 觸摸設備檢測：已啟用觸摸優化');
+            }
+
+            // 檢測網路狀況
+            if ('connection' in navigator) {
+                const connection = navigator.connection;
+                if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+                    document.body.classList.add('slow-connection');
+                    console.log('📶 慢速網路檢測：已啟用節能模式');
+                }
+            }
+
+            // 檢測電池狀況
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(function(battery) {
+                    if (battery.level < 0.2 && !battery.charging) {
+                        document.body.classList.add('low-battery');
+                        console.log('🔋 低電量檢測：已啟用節能模式');
+                    }
+                });
+            }
+
+            // 檢測動畫偏好
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.body.classList.add('reduced-motion');
+                console.log('♿ 減少動畫偏好檢測：已禁用動畫');
+            }
+
+            // 檢測色彩偏好
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-theme');
+                console.log('🌙 深色主題偏好檢測：已啟用深色模式');
+            }
+
+            // 檢測高對比度偏好
+            if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
+                document.body.classList.add('high-contrast');
+                console.log('🔍 高對比度偏好檢測：已啟用高對比度模式');
+            }
+        })();
+    </script>
+
+    <!-- Service Worker 註冊（如果需要離線功能） -->
+    <script>
+        // Service Worker 支援檢測
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // 註冊 service worker（如果存在）
+                navigator.serviceWorker.register('/static/sw.js')
+                .then(function(registration) {
+                    console.log('📱 Service Worker 註冊成功:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('📱 Service Worker 註冊失敗:', error);
+                });
+            });
+        }
+    </script>
+
+    <!-- 開發模式調試工具 -->
+    {% if config.DEBUG %}
+    <script>
+        console.log('🔧 開發模式已啟用');
+        console.log('💡 可用的調試指令:');
+        console.log('  getBookmarkStatus() - 查看書籤系統狀態');
+        console.log('  reinitializeBookmarks() - 重新初始化書籤系統');
+        console.log('  showComingSoon("測試功能") - 測試模態框');
+        console.log('  closeComingSoonModal() - 關閉模態框');
+        
+        // 全域調試函數
+        window.debugBookmarks = function() {
+            const bookmarks = document.querySelectorAll('.bookmark');
+            bookmarks.forEach((bookmark, index) => {
+                console.log(`書籤 ${index + 1}:`, {
+                    id: bookmark.dataset.bookmarkId,
+                    enabled: bookmark.dataset.enabled,
+                    route: bookmark.dataset.route,
+                    title: bookmark.dataset.title,
+                    element: bookmark
+                });
+            });
+        };
+        
+        window.debugModal = function() {
+            const modal = document.getElementById('coming-soon-modal');
+            console.log('模態框狀態:', {
+                element: modal,
+                display: modal ? window.getComputedStyle(modal).display : 'not found',
+                classList: modal ? Array.from(modal.classList) : []
+            });
+        };
+        
+        console.log('🔍 額外調試指令: debugBookmarks(), debugModal()');
+    </script>
+    {% endif %}
+
+    <!-- 樣式內聯（針對關鍵 CSS） -->
+    <style>
+        /* 防止 FOUC (Flash of Unstyled Content) */
+        .main-container {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .main-container.loaded {
+            opacity: 1;
+        }
+        
+        /* 載入指示器 */
+        .loading-fallback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FFD700;
+            font-size: 1.2rem;
+            z-index: 9999;
+        }
+        
+        /* 無障礙跳轉連結 */
+        .skip-links {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            z-index: 10000;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 0 0 4px 0;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+        
+        /* 錯誤邊界樣式 */
+        .error-boundary {
+            padding: 20px;
+            border: 2px solid #ff4757;
+            border-radius: 8px;
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+            text-align: center;
+            margin: 20px;
+        }
+        
+        /* 載入失敗提示 */
+        .load-error {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 71, 87, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 9999;
+            max-width: 300px;
+        }
+        
+        /* 慢速網路優化 */
+        .slow-connection .book-decoration,
+        .low-battery .book-decoration {
+            animation: none !important;
+        }
+        
+        .slow-connection .site-title,
+        .low-battery .site-title {
+            animation: none !important;
+        }
+    </style>
+
+    <!-- 載入完成腳本 -->
+    <script>
+        // 頁面載入完成處理
+        document.addEventListener('DOMContentLoaded', function() {
+            // 移除載入效果
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer) {
+                mainContainer.classList.add('loaded');
+            }
+            
+            // 移除載入指示器
+            const loadingFallback = document.querySelector('.loading-fallback');
+            if (loadingFallback) {
+                loadingFallback.remove();
+            }
+            
+            console.log('✨ 頁面已載入完成');
+        });
+
+        // 資源載入錯誤處理
+        window.addEventListener('error', function(e) {
+            if (e.target !== window) {
+                // 資源載入錯誤
+                console.error('❌ 資源載入失敗:', e.target.src || e.target.href);
+                
+                // 顯示錯誤提示
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'load-error';
+                errorDiv.innerHTML = `
+                    <strong>載入錯誤</strong><br>
+                    部分資源載入失敗，頁面功能可能受影響。
+                    <button onclick="location.reload()" style="margin-left: 10px; padding: 4px 8px; border: none; background: rgba(255,255,255,0.2); color: white; border-radius: 4px; cursor: pointer;">重新載入</button>
+                `;
+                document.body.appendChild(errorDiv);
+                
+                // 5秒後自動移除
+                setTimeout(() => {
+                    if (document.body.contains(errorDiv)) {
+                        document.body.removeChild(errorDiv);
+                    }
+                }, 5000);
+            }
+        }, true);
+    </script>
+
+    <!-- 載入中提示（在JavaScript載入前顯示） -->
+    <div class="loading-fallback">
+        ⭐ 載入中...
+    </div>
 </body>
 </html>
