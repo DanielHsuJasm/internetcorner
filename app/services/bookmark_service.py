@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Dict
 from ..services.photo_service import list_photos
+from ..services.birthday_service import get_birthday_stats
 
 class BookmarkConfig:
     """書籤配置類"""
@@ -24,6 +25,16 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
     photo_count = len(photos)
     memory_description = f"{photo_count} 個珍貴回憶" if photo_count > 0 else "等待你的第一段回憶"
     
+    # 🎂 動態獲取生日照片統計
+    birthday_stats = get_birthday_stats()
+    if birthday_stats['total_photos'] > 0:
+        if birthday_stats['years_count'] > 1:
+            birthday_description = f"{birthday_stats['years_count']} 年的生日回憶"
+        else:
+            birthday_description = f"{birthday_stats['total_photos']} 個生日時刻"
+    else:
+        birthday_description = "記錄每年的生日時光"
+    
     bookmarks = [
         BookmarkConfig(
             id="memory_film",
@@ -40,8 +51,8 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             icon="🎂",
             color="#4ECDC4", 
             route="birthday.index",
-            description="每年生日",
-            enabled=False,
+            description=birthday_description,
+            enabled=True,
             date="xxxx.06.26"
         ),
         BookmarkConfig(
@@ -50,7 +61,7 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             icon="🗺️",
             color="#45B7D1",
             route="anniversary.index", 
-            description="足跡遍佈的美好時光",
+            description="",
             enabled=False,  # 未啟用功能
             date=" "
         )

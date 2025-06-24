@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日回憶 - 每一年的美好時光</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/birthday.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 生日氣球背景 -->
+    <div class="balloons-container">
+        <div class="balloon balloon-1">🎈</div>
+        <div class="balloon balloon-2">🎈</div>
+        <div class="balloon balloon-3">🎈</div>
+        <div class="balloon balloon-4">🎈</div>
+        <div class="balloon balloon-5">🎈</div>
+    </div>
+
+    <!-- 返回首頁按鈕 -->
+    <div class="back-to-home">
+        <a href="{{ url_for('home.index') }}" class="back-button">
+            <span class="back-icon">📚</span>
+            <span class="back-text">回到書本</span>
+        </a>
+    </div>
+
+    <header>
+        <h1>🎂 生日回憶 🎂</h1>
+        <p class="header-subtitle">珍藏每一年的生日時光</p>
+        
+        <!-- 統計資訊 -->
+        {% if stats.total_photos > 0 %}
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number">{{ stats.total_photos }}</span>
+                <span class="stat-label">張照片</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ stats.years_count }}</span>
+                <span class="stat-label">個年份</span>
+            </div>
+            {% if stats.latest_year %}
+            <div class="stat-item">
+                <span class="stat-number">{{ stats.latest_year }}</span>
+                <span class="stat-label">最新年份</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </header>
+
+    <main>
+        <!-- Flash 訊息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flash-messages">
+            {% for category, msg in messages %}
+            <li class="flash {{ category }}">{{ msg }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- 上傳區域 -->
+        <section class="upload-section">
+            <div class="upload-intro">
+                <h2>📸 上傳生日照片</h2>
+                <p>記錄每年的生日時光，讓回憶永遠綻放</p>
+            </div>
+            
+            <form id="upload-form" action="{{ url_for('birthday.upload') }}" method="post" enctype="multipart/form-data">
+                <div class="upload-form-grid">
+                    <div class="form-group">
+                        <label for="file-input" class="file-label">選擇生日照片...</label>
+                        <input id="file-input" type="file" name="photos" accept="image/*" multiple 
+                               title="支援 PNG, JPG, JPEG, GIF 格式">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthday-year">生日年份</label>
+                        <input type="number" id="birthday-year" name="birthday_year" 
+                               min="1900" max="{{ current_year + 10 }}" 
+                               value="{{ current_year if not selected_year else selected_year }}"
+                               placeholder="例如: {{ current_year }}">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="description">照片描述 (可選)</label>
+                        <input type="text" id="description" name="description" 
+                               placeholder="例如: 與家人一起的生日聚會">
+                    </div>
+                </div>
+                
+                <button type="submit" class="upload-button">
+                    <span>🎉 上傳生日回憶</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- 年份篩選 -->
+        {% if years|length > 0 %}
+        <section class="filter-section">
+            <h3>📅 按年份瀏覽</h3>
+            <div class="year-filters">
+                <a href="{{ url_for('birthday.index') }}" 
+                   class="year-filter {% if not selected_year %}active{% endif %}">
+                    全部
+                </a>
+                {% for year in years %}
+                <a href="{{ url_for('birthday.year_view', year=year) }}" 
+                   class="year-filter {% if selected_year == year %}active{% endif %}">
+                    {{ year }}
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 照片展示區域 -->
+        <section class="photos-section">
+            {% if photos|length == 0 %}
+                <div class="no-photo">
+                    <div class="no-photo-icon">🎂</div>
+                    <h3>還沒有生日照片</h3>
+                    <p>上傳你的第一張生日照片，開始記錄美好時光！</p>
+                </div>
+            {% else %}
+                <div class="birthday-gallery">
+                    {% for photo in photos %}
+                    <div class="photo-card" data-year="{{ photo.birthday_year }}">
+                        <div class="photo-frame">
+                            <img src="{{ photo.url }}" 
+                                 alt="生日照片 {{ photo.birthday_year }}年{% if photo.description %} - {{ photo.description }}{% endif %}"
+                                 class="birthday-photo"
+                                 onclick="showPhotoModal(this)">
+                            
+                            <!-- 年份標籤 -->
+                            <div class="year-tag">{{ photo.birthday_year }}</div>
+                            
+                            <!-- 刪除按鈕 -->
+                            <form action="{{ url_for('birthday.delete', photo_id=photo.id) }}" 
+                                  method="post" 
+                                  class="delete-form"
+                                  onsubmit="return confirm('確定要刪除這張生日照片嗎？');">
+                                <button type="submit" class="delete-btn" aria-label="刪除照片">×</button>
+                            </form>
+                        </div>
+                        
+                        <!-- 照片資訊 -->
+                        <div class="photo-info">
+                            {% if photo.description %}
+                            <p class="photo-description">{{ photo.description }}</p>
+                            {% endif %}
+                            <p class="photo-date">{{ photo.uploaded_at.strftime('%Y年%m月%d日') }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- 照片放大模態框 -->
+    <div id="photo-modal" class="photo-modal" onclick="closePhotoModal()">
+        <div class="modal-content">
+            <img id="modal-image" src="" alt="">
+            <div class="modal-info">
+                <span id="modal-year"></span>
+                <span id="modal-description"></span>
+            </div>
+            <button class="modal-close" onclick="closePhotoModal()">×</button>
+        </div>
+    </div>
+
+    <!-- 生日祝福信件 -->
+    <div class="birthday-card-container" tabindex="0" role="button" aria-label="生日祝福卡片">
+        <div class="birthday-card">
+            <div class="card-front">
+                <div class="cake-icon">🎂</div>
+                <div class="birthday-text">生日快樂</div>
+            </div>
+        </div>
+        
+        <div class="birthday-message">
+            <div class="close-hint">點擊任意處關閉 ✕</div>
+            <h3>🎉 生日快樂！</h3>
+            <p>願每一年的生日都充滿歡聲笑語，</p>
+            <p>願每一個願望都能實現，</p>
+            <p>願每一張照片都記錄著最美好的瞬間。</p>
+            <p>讓我們一起珍藏這些珍貴的回憶，</p>
+            <p>讓愛與溫暖永遠陪伴著你！</p>
+            <div class="signature">
+                <p>— 來自生日回憶的溫暖祝福 🎈</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/birthday.js') }}"></script>
+</body>
+</html>
