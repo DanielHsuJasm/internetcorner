@@ -1,6 +1,6 @@
 /**
- * 🔧 完整修復版 home.js - 書籤往右滑出系統
- * 主要修復：書籤從書的右邊往右滑出，預設幾乎完全隱藏，文字不被書本擋住
+ * 🔧 修復版 home.js - 書籤完全隱藏在書底下，懸停時才顯示
+ * 主要修復：書籤預設完全隱藏，滑鼠懸停書本時才顯示書籤，懸停書籤時顯示文字
  */
 
 class BookmarkSystem {
@@ -42,8 +42,8 @@ class BookmarkSystem {
                 return;
             }
             
-            // 🔧 確保書籤預設狀態和層級正確
-            this.setupBookmarkInitialStates();
+            // 🔧 設置初始狀態 - 完全隱藏書籤
+            this.setupInitialState();
             this.setupBookmarkStructure();
             this.setupBookmarkEvents();
             this.setupModalSystem();
@@ -53,7 +53,7 @@ class BookmarkSystem {
             this.setupSoundSystem();
             
             this.isInitialized = true;
-            console.log('📚 書籤系統初始化完成！(完整修復版)');
+            console.log('📚 書籤系統初始化完成！(修復版 - 完全隱藏)');
             
         } catch (error) {
             console.error('📚 書籤系統初始化失敗:', error);
@@ -61,42 +61,59 @@ class BookmarkSystem {
     }
     
     /**
-     * 🔧 設置書籤預設狀態和層級
+     * 🔧 設置初始狀態 - 書籤完全隱藏在書底下
      */
-    setupBookmarkInitialStates() {
-        // 確保書籤容器預設位置正確
+    setupInitialState() {
+        // 🔧 書籤容器預設完全隱藏
         if (this.bookmarksContainer) {
-            this.bookmarksContainer.style.right = '-150px'; // 隱藏大部分
-            this.bookmarksContainer.style.zIndex = '10'; // 容器層級
+            this.bookmarksContainer.style.right = '-200px'; // 完全隱藏
+            this.bookmarksContainer.style.opacity = '0'; // 完全透明
+            this.bookmarksContainer.style.zIndex = '1'; // 在書本之下
+            this.bookmarksContainer.style.pointerEvents = 'none'; // 預設不可點擊
         }
         
-        // 確保所有書籤預設狀態和層級正確
+        // 🔧 所有書籤預設狀態
         this.bookmarks.forEach((bookmark, index) => {
             const text = bookmark.querySelector('.bookmark-text');
             const icon = bookmark.querySelector('.bookmark-icon');
+            const badge = bookmark.querySelector('.coming-soon-badge');
             
+            // 🔧 文字預設完全隱藏
             if (text) {
                 text.style.opacity = '0';
-                text.style.transform = 'translateX(-10px)';
+                text.style.transform = 'translateX(-20px)';
                 text.style.transition = 'all 0.3s ease 0.1s';
-                text.style.zIndex = '10000'; // 🔧 文字層級
-                text.style.position = 'relative'; // 🔧 確保 z-index 生效
+                text.style.zIndex = '10000';
+                text.style.position = 'relative';
+                text.style.pointerEvents = 'none'; // 預設不可點擊
             }
             
+            // 🔧 圖標預設顯示
             if (icon) {
                 icon.style.opacity = '1';
                 icon.style.transform = 'scale(1)';
-                icon.style.zIndex = '9999'; // 🔧 圖標層級
-                icon.style.position = 'relative'; // 🔧 確保 z-index 生效
+                icon.style.zIndex = '9999';
+                icon.style.position = 'relative';
             }
             
-            // 🔧 書籤基本層級和位置
-            bookmark.style.transform = 'translateX(0)';
-            bookmark.style.opacity = '0.9';
-            bookmark.style.zIndex = '11'; // 🔧 書籤基本層級
-            bookmark.style.position = 'relative'; // 🔧 確保 z-index 生效
+            // 🔧 徽章預設顯示但跟隨容器透明度
+            if (badge) {
+                badge.style.opacity = '1'; // 徽章本身不透明
+                badge.style.position = 'absolute';
+                badge.style.top = '-8px';
+                badge.style.right = '-5px'; // 與綠色書籤相同位置
+                badge.style.transform = 'translateX(0)';
+                badge.style.zIndex = '10002';
+            }
             
-            console.log(`📑 書籤 ${index + 1} 預設狀態和層級已設置`);
+            // 🔧 書籤基本狀態
+            bookmark.style.transform = 'translateX(0)';
+            bookmark.style.opacity = '0.8';
+            bookmark.style.zIndex = '11';
+            bookmark.style.position = 'relative';
+            bookmark.style.pointerEvents = 'auto'; // 書籤本身可點擊
+            
+            console.log(`📑 書籤 ${index + 1} 初始狀態已設置`);
         });
     }
     
@@ -115,26 +132,6 @@ class BookmarkSystem {
                 return;
             }
             
-            // 重新組織內容結構
-            if (!tab.querySelector('.bookmark-content')) {
-                const content = document.createElement('div');
-                content.className = 'bookmark-content';
-                
-                // 移動現有內容到新容器
-                content.appendChild(text.cloneNode(true));
-                content.appendChild(icon.cloneNode(true));
-                
-                // 清空tab並添加新結構
-                tab.innerHTML = '';
-                tab.appendChild(content);
-                
-                // 如果有徽章，移動到正確位置
-                const badge = bookmark.querySelector('.coming-soon-badge');
-                if (badge) {
-                    bookmark.appendChild(badge.cloneNode(true));
-                }
-            }
-            
             // 設置書籤屬性
             bookmark.setAttribute('tabindex', '0');
             bookmark.setAttribute('role', 'button');
@@ -148,6 +145,18 @@ class BookmarkSystem {
      * 🔧 設置書籤事件
      */
     setupBookmarkEvents() {
+        // 🔧 書本懸停事件 - 顯示/隱藏書籤容器
+        if (this.bookContainer) {
+            this.bookContainer.addEventListener('mouseenter', () => {
+                this.showBookmarksContainer();
+            });
+            
+            this.bookContainer.addEventListener('mouseleave', () => {
+                this.hideBookmarksContainer();
+            });
+        }
+        
+        // 🔧 書籤個別事件
         this.bookmarks.forEach((bookmark) => {
             const isEnabled = bookmark.dataset.enabled === 'true';
             
@@ -157,7 +166,7 @@ class BookmarkSystem {
                 this.handleBookmarkClick(bookmark, isEnabled);
             });
             
-            // 🔧 懸停事件 - 往右滑出並顯示文字，設置最高層級
+            // 🔧 書籤懸停事件 - 顯示文字
             bookmark.addEventListener('mouseenter', () => {
                 this.handleBookmarkHover(bookmark, true);
                 if (this.soundSystem) {
@@ -169,28 +178,12 @@ class BookmarkSystem {
                 this.handleBookmarkHover(bookmark, false);
             });
             
-            // 🔧 觸摸事件 - 含層級處理
+            // 🔧 觸摸事件
             let touchTimeout;
             bookmark.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 bookmark.classList.add('touch-active');
                 this.handleBookmarkHover(bookmark, true);
-                
-                // 🔧 觸摸時立即設置最高層級
-                bookmark.style.zIndex = '9999';
-                bookmark.style.position = 'relative';
-                
-                const text = bookmark.querySelector('.bookmark-text');
-                if (text) {
-                    text.style.zIndex = '10001';
-                    text.style.position = 'relative';
-                }
-                
-                const icon = bookmark.querySelector('.bookmark-icon');
-                if (icon) {
-                    icon.style.zIndex = '10000';
-                    icon.style.position = 'relative';
-                }
                 
                 // 觸摸震動反饋
                 if (navigator.vibrate) {
@@ -217,43 +210,109 @@ class BookmarkSystem {
             });
         });
         
-        // 🔧 書本懸停事件 - 書籤容器從右邊往右移
-        if (this.bookContainer) {
-            this.bookContainer.addEventListener('mouseenter', () => {
-                this.handleBookHover(true);
-            });
-            
-            this.bookContainer.addEventListener('mouseleave', () => {
-                this.handleBookHover(false);
-            });
-        }
-        
-        console.log('📑 書籤事件已設置 (完整修復版)');
+        console.log('📑 書籤事件已設置 (修復版)');
     }
     
     /**
-     * 🔧 處理書本懸停
+     * 🔧 顯示書籤容器
      */
-    handleBookHover(isHovering) {
+    showBookmarksContainer() {
+        if (this.bookmarksContainer) {
+            this.bookmarksContainer.style.right = '-80px'; // 顯示位置
+            this.bookmarksContainer.style.opacity = '1'; // 完全不透明
+            this.bookmarksContainer.style.zIndex = '10'; // 提高到書本之上
+            this.bookmarksContainer.style.pointerEvents = 'auto'; // 可點擊
+            this.bookmarksContainer.style.transition = 'right 0.4s ease, opacity 0.4s ease, z-index 0s ease';
+        }
+        
+        // 書本懸停效果
         const book = this.bookContainer.querySelector('.book');
+        if (book) {
+            book.style.transform = 'translateY(-5px) scale(1.02)';
+        }
+        
+        console.log('📚 書籤容器已顯示');
+    }
+    
+    /**
+     * 🔧 隱藏書籤容器
+     */
+    hideBookmarksContainer() {
+        if (this.bookmarksContainer) {
+            this.bookmarksContainer.style.right = '-200px'; // 完全隱藏
+            this.bookmarksContainer.style.opacity = '0'; // 完全透明
+            this.bookmarksContainer.style.transition = 'right 0.4s ease, opacity 0.4s ease, z-index 0s ease 0.2s';
+            
+            // 延遲降低層級，讓動畫完成
+            setTimeout(() => {
+                if (this.bookmarksContainer) {
+                    this.bookmarksContainer.style.zIndex = '1'; // 降低到書本之下
+                    this.bookmarksContainer.style.pointerEvents = 'none'; // 不可點擊
+                }
+            }, 200);
+        }
+        
+        // 恢復書本狀態
+        const book = this.bookContainer.querySelector('.book');
+        if (book) {
+            book.style.transform = '';
+        }
+        
+        // 🔧 隱藏所有書籤文字
+        this.bookmarks.forEach(bookmark => {
+            this.handleBookmarkHover(bookmark, false);
+        });
+        
+        console.log('📚 書籤容器已隱藏');
+    }
+    
+    /**
+     * 🔧 處理書籤懸停 - 顯示/隱藏文字
+     */
+    handleBookmarkHover(bookmark, isHovering) {
+        const text = bookmark.querySelector('.bookmark-text');
+        const icon = bookmark.querySelector('.bookmark-icon');
         
         if (isHovering) {
-            // 書本懸停效果
-            if (book) {
-                book.style.transform = 'translateY(-5px) scale(1.02)';
+            // 🔧 懸停進入 - 書籤滑出，顯示文字，最高層級
+            bookmark.style.transform = 'translateX(50px)';
+            bookmark.style.opacity = '1';
+            bookmark.style.zIndex = '9999';
+            bookmark.style.position = 'relative';
+            
+            if (text) {
+                text.style.opacity = '1';
+                text.style.transform = 'translateX(0)';
+                text.style.zIndex = '10001';
+                text.style.position = 'relative';
+                text.style.pointerEvents = 'auto'; // 懸停時可點擊
             }
-            // 🔧 書籤容器從右邊往右移露出更多
-            if (this.bookmarksContainer) {
-                this.bookmarksContainer.style.right = '-80px';
+            
+            if (icon) {
+                icon.style.transform = 'scale(1.1)';
+                icon.style.filter = 'drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9))';
+                icon.style.zIndex = '10000';
+                icon.style.position = 'relative';
             }
+            
+            console.log('📑 書籤懸停：文字已顯示', bookmark.dataset.bookmarkId);
         } else {
-            // 恢復書本狀態
-            if (book) {
-                book.style.transform = '';
+            // 🔧 懸停離開 - 書籤回位，隱藏文字，回到正常層級
+            bookmark.style.transform = 'translateX(0)';
+            bookmark.style.opacity = '0.8';
+            bookmark.style.zIndex = '11';
+            
+            if (text) {
+                text.style.opacity = '0';
+                text.style.transform = 'translateX(-20px)';
+                text.style.zIndex = '10000';
+                text.style.pointerEvents = 'none'; // 隱藏時不可點擊
             }
-            // 🔧 書籤容器回到隱藏狀態
-            if (this.bookmarksContainer) {
-                this.bookmarksContainer.style.right = '-150px';
+            
+            if (icon) {
+                icon.style.transform = '';
+                icon.style.filter = '';
+                icon.style.zIndex = '9999';
             }
         }
     }
@@ -281,7 +340,7 @@ class BookmarkSystem {
             this.showComingSoon(title);
         }
         
-        // 🔧 點擊動畫 - 快速往右再恢復
+        // 🔧 點擊動畫 - 快速滑出再恢復
         bookmark.style.transform = 'translateX(55px) scale(0.95)';
         bookmark.style.transition = 'transform 0.15s ease';
         
@@ -291,53 +350,6 @@ class BookmarkSystem {
         }, 150);
         
         console.log(`📑 書籤點擊: ${bookmarkId}`);
-    }
-    
-    /**
-     * 🔧 最關鍵修復：處理書籤懸停 - 確保層級最高
-     */
-    handleBookmarkHover(bookmark, isHovering) {
-        const text = bookmark.querySelector('.bookmark-text');
-        const icon = bookmark.querySelector('.bookmark-icon');
-        
-        if (isHovering) {
-            // 🔧 懸停進入 - 設置最高層級
-            bookmark.style.transform = 'translateX(50px)';
-            bookmark.style.opacity = '1';
-            bookmark.style.zIndex = '9999'; /* 🔧 最高層級 */
-            bookmark.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
-            
-            if (text) {
-                text.style.opacity = '1';
-                text.style.transform = 'translateX(0)';
-                text.style.zIndex = '10001'; /* 🔧 文字層級最高 */
-                text.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
-            }
-            if (icon) {
-                icon.style.transform = 'scale(1.1)';
-                icon.style.filter = 'drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9))';
-                icon.style.zIndex = '10000'; /* 🔧 圖標高層級 */
-                icon.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
-            }
-            
-            console.log('📑 書籤懸停：層級已設為最高', bookmark.dataset.bookmarkId);
-        } else {
-            // 🔧 懸停離開 - 回到正常層級
-            bookmark.style.transform = 'translateX(0)';
-            bookmark.style.opacity = '0.9';
-            bookmark.style.zIndex = '11'; /* 🔧 回到正常層級 */
-            
-            if (text) {
-                text.style.opacity = '0';
-                text.style.transform = 'translateX(-10px)';
-                text.style.zIndex = '10000'; /* 🔧 回到正常層級 */
-            }
-            if (icon) {
-                icon.style.transform = '';
-                icon.style.filter = '';
-                icon.style.zIndex = '9999'; /* 🔧 回到正常層級 */
-            }
-        }
     }
     
     /**
@@ -435,63 +447,68 @@ class BookmarkSystem {
     }
     
     /**
-     * 🔧 高亮顯示書籤 - 確保層級最高
+     * 🔧 高亮顯示書籤
      */
     highlightBookmark(bookmark) {
+        // 先顯示書籤容器
+        this.showBookmarksContainer();
+        
         // 清除其他高亮
         this.clearHighlight();
         
-        // 🔧 高亮當前書籤（最高層級）
+        // 🔧 高亮當前書籤
         bookmark.style.outline = '2px solid var(--gold)';
         bookmark.style.outlineOffset = '2px';
         bookmark.style.transform = 'translateX(50px)';
         bookmark.style.opacity = '1';
-        bookmark.style.zIndex = '9999'; /* 🔧 最高層級 */
-        bookmark.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
+        bookmark.style.zIndex = '9999';
+        bookmark.style.position = 'relative';
         
-        // 顯示文字並設置最高層級
+        // 顯示文字
         const text = bookmark.querySelector('.bookmark-text');
         if (text) {
             text.style.opacity = '1';
             text.style.transform = 'translateX(0)';
-            text.style.zIndex = '10001'; /* 🔧 文字層級最高 */
-            text.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
+            text.style.zIndex = '10001';
+            text.style.position = 'relative';
+            text.style.pointerEvents = 'auto';
         }
         
         const icon = bookmark.querySelector('.bookmark-icon');
         if (icon) {
-            icon.style.zIndex = '10000'; /* 🔧 圖標高層級 */
-            icon.style.position = 'relative'; /* 🔧 確保 z-index 生效 */
+            icon.style.zIndex = '10000';
+            icon.style.position = 'relative';
         }
     }
     
     /**
-     * 🔧 清除高亮 - 恢復正常層級
+     * 🔧 清除高亮
      */
     clearHighlight() {
         this.bookmarks.forEach(bookmark => {
             bookmark.style.outline = '';
             bookmark.style.outlineOffset = '';
             bookmark.style.transform = 'translateX(0)';
-            bookmark.style.opacity = '0.9';
-            bookmark.style.zIndex = '11'; /* 🔧 回到正常層級 */
+            bookmark.style.opacity = '0.8';
+            bookmark.style.zIndex = '11';
             
             const text = bookmark.querySelector('.bookmark-text');
             if (text) {
                 text.style.opacity = '0';
-                text.style.transform = 'translateX(-10px)';
-                text.style.zIndex = '10000'; /* 🔧 回到正常層級 */
+                text.style.transform = 'translateX(-20px)';
+                text.style.zIndex = '10000';
+                text.style.pointerEvents = 'none';
             }
             
             const icon = bookmark.querySelector('.bookmark-icon');
             if (icon) {
-                icon.style.zIndex = '9999'; /* 🔧 回到正常層級 */
+                icon.style.zIndex = '9999';
             }
         });
     }
     
     /**
-     * 🔧 設置觸摸支持（含層級處理）
+     * 🔧 設置觸摸支持
      */
     setupTouchSupport() {
         if ('ontouchstart' in window) {
@@ -525,7 +542,7 @@ class BookmarkSystem {
                 }
             });
             
-            console.log('👆 觸摸支持已設置（含層級處理）');
+            console.log('👆 觸摸支持已設置');
         }
     }
     
@@ -533,28 +550,18 @@ class BookmarkSystem {
      * 🔧 處理右滑手勢
      */
     handleSwipeRight() {
-        // 右滑時顯示書籤
-        this.bookmarksContainer.style.transition = 'right 0.3s ease';
-        this.bookmarksContainer.style.right = '-60px';
+        this.showBookmarksContainer();
         
         setTimeout(() => {
-            this.bookmarksContainer.style.transition = '';
-            this.bookmarksContainer.style.right = '';
-        }, 2000);
+            this.hideBookmarksContainer();
+        }, 3000);
     }
     
     /**
      * 🔧 處理左滑手勢
      */
     handleSwipeLeft() {
-        // 左滑時完全隱藏書籤
-        this.bookmarksContainer.style.transition = 'right 0.3s ease';
-        this.bookmarksContainer.style.right = '-200px';
-        
-        setTimeout(() => {
-            this.bookmarksContainer.style.transition = '';
-            this.bookmarksContainer.style.right = '';
-        }, 2000);
+        this.hideBookmarksContainer();
     }
     
     /**
@@ -1144,7 +1151,7 @@ function initializeApp() {
             }
         }, { once: true });
         
-        console.log('✨ InternetCorner 系統初始化完成！(完整修復版)');
+        console.log('✨ InternetCorner 系統初始化完成！(修復版 - 完全隱藏書籤)');
         
         // 標記頁面已準備就緒
         document.body.classList.add('app-ready');
@@ -1219,6 +1226,21 @@ window.setSoundVolume = function(volume) {
     }
 };
 
+// 🔧 新增：手動顯示/隱藏書籤的調試函數
+window.showBookmarks = function() {
+    if (bookmarkSystem) {
+        bookmarkSystem.showBookmarksContainer();
+        console.log('📚 手動顯示書籤');
+    }
+};
+
+window.hideBookmarks = function() {
+    if (bookmarkSystem) {
+        bookmarkSystem.hideBookmarksContainer();
+        console.log('📚 手動隱藏書籤');
+    }
+};
+
 // ===== 頁面卸載處理 =====
 
 window.addEventListener('beforeunload', function() {
@@ -1234,6 +1256,10 @@ window.addEventListener('beforeunload', function() {
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         console.log('👁️ 頁面已隱藏');
+        // 🔧 頁面隱藏時自動隱藏書籤
+        if (bookmarkSystem) {
+            bookmarkSystem.hideBookmarksContainer();
+        }
     } else {
         console.log('👁️ 頁面已顯示');
         if (bookmarkSystem && !bookmarkSystem.isInitialized) {
@@ -1257,15 +1283,16 @@ if ('navigator' in window && 'onLine' in navigator) {
         if (bookmarkSystem) {
             bookmarkSystem.showNotification('網路連接已中斷', 'warning');
         }
-    }
-    );
+    });
 }
 
-console.log('📚 home.js 已完全載入 (完整修復版)');
+console.log('📚 home.js 已完全載入 (修復版 - 完全隱藏書籤)');
 console.log('💡 可用的全域指令:');
 console.log('  getBookmarkStatus() - 查看書籤系統狀態');
 console.log('  reinitializeBookmarks() - 重新初始化書籤');
 console.log('  showComingSoon("功能名稱") - 顯示即將推出提示');
 console.log('  toggleSound() - 切換音效開關');
 console.log('  setSoundVolume(0.5) - 設定音效音量');
-console.log('🎉 InternetCorner 準備就緒！(完整修復版 - 書籤往右滑出，文字不被擋住)');
+console.log('  showBookmarks() - 手動顯示書籤 (調試用)');
+console.log('  hideBookmarks() - 手動隱藏書籤 (調試用)');
+console.log('🎉 InternetCorner 準備就緒！(修復版 - 書籤完全隱藏在書底下，懸停時才顯示)');
