@@ -224,8 +224,7 @@ body::before {
     50% { transform: rotate(180deg); }
 }
 
-/* ===== 強化版書籤修復CSS ===== */
-
+/* ===== 修復後的書籤樣式 ===== */
 
 /* 關鍵修復：書本和書籤的層級關係 */
 .book-container {
@@ -257,7 +256,7 @@ body::before {
     pointer-events: auto !important;
 }
 
-/* 🔧 書籤基本樣式 - 完全重寫 */
+/* 🔧 書籤基本樣式 - 修復圓頭向右 */
 .bookmark {
     position: relative !important;
     width: 250px !important;
@@ -265,7 +264,7 @@ body::before {
     cursor: pointer;
     transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
     transform: translateX(200px) !important;
-    opacity: 0.15 !important; /* 🔧 稍微提高隱藏時的透明度 */
+    opacity: 0.15 !important;
     display: flex !important;
     visibility: visible !important;
     z-index: 45 !important;
@@ -275,7 +274,7 @@ body::before {
 .bookmark:hover {
     transform: translateX(0) !important;
     opacity: 1 !important;
-    z-index: 100 !important; /* 🔧 懸停時超高層級 */
+    z-index: 100 !important;
     box-shadow: -8px 0 25px rgba(0, 0, 0, 0.5) !important;
 }
 
@@ -285,102 +284,73 @@ body::before {
     opacity: 0.9 !important;
 }
 
-/* 🔧 書籤標籤 - 超強不透明背景 */
+/* 🔧 書籤標籤 - 修復圓頭位置（左側圓角，右側直角） */
 .bookmark-tab {
     width: 100% !important;
     height: 100% !important;
-    border-radius: 25px 0 0 25px !important;
+    border-radius: 0 25px 25px 0 !important; /* 🔧 修復：左側直角，右側圓角 */
     position: relative !important;
-    box-shadow: -3px 2px 15px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 3px 2px 15px rgba(0, 0, 0, 0.4) !important; /* 🔧 陰影改到右側 */
     overflow: hidden !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    padding: 8px 55px 8px 15px !important;
+    padding: 8px 15px 8px 55px !important; /* 🔧 修改padding，左邊大，右邊小 */
     border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    
-    /* 🔧 超強背景設定 */
-    background-color: #FF6B6B !important; /* 預設鮮豔紅色 */
+    background-color: #FF6B6B !important;
     background-image: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    
-    /* 🔧 添加多層背景保護 */
     background-clip: border-box !important;
     -webkit-background-clip: border-box !important;
 }
 
 /* 🔧 書籤顏色 - 使用更鮮豔、完全不透明的顏色 */
 .bookmark-color-1 .bookmark-tab { 
-    background: #FF4757 !important; /* 鮮豔紅色 */
+    background: #FF4757 !important;
     background-color: #FF4757 !important;
     background-image: none !important;
 }
 .bookmark-color-2 .bookmark-tab { 
-    background: #2ED573 !important; /* 鮮豔綠色 */
+    background: #2ED573 !important;
     background-color: #2ED573 !important;
     background-image: none !important;
 }
 .bookmark-color-3 .bookmark-tab { 
-    background: #3742FA !important; /* 鮮豔藍色 */
+    background: #3742FA !important;
     background-color: #3742FA !important;
     background-image: none !important;
 }
 .bookmark-color-4 .bookmark-tab { 
-    background: #2F3542 !important; /* 深灰色 */
+    background: #2F3542 !important;
     background-color: #2F3542 !important;
     background-image: none !important;
 }
 .bookmark-color-5 .bookmark-tab { 
-    background: #FFA502 !important; /* 鮮豔橙色 */
+    background: #FFA502 !important;
     background-color: #FFA502 !important;
     background-image: none !important;
 }
 .bookmark-color-6 .bookmark-tab { 
-    background: #A4B0BE !important; /* 淺藍灰 */
+    background: #A4B0BE !important;
     background-color: #A4B0BE !important;
     background-image: none !important;
 }
 .bookmark-color-7 .bookmark-tab { 
-    background: #FF3838 !important; /* 亮紅色 */
+    background: #FF3838 !important;
     background-color: #FF3838 !important;
     background-image: none !important;
 }
 .bookmark-color-8 .bookmark-tab { 
-    background: #8B5CF6 !important; /* 紫色 */
+    background: #8B5CF6 !important;
     background-color: #8B5CF6 !important;
     background-image: none !important;
 }
 
-/* 🔧 添加偽元素作為額外的不透明背景層 */
-.bookmark-tab::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: inherit !important;
-    z-index: -1 !important;
-    opacity: 1 !important;
-}
-
-.bookmark-tab::after {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: inherit !important;
-    z-index: -2 !important;
-    opacity: 1 !important;
-}
-
-/* 🔧 圖標定位 - 絕對定位到右側 */
+/* 🔧 圖標定位 - 移到左側 */
 .bookmark-icon {
     position: absolute !important;
-    right: 15px !important;
+    left: 15px !important; /* 🔧 修改：移到左側 */
     top: 50% !important;
     transform: translateY(-50%) !important;
     font-size: 1.8rem !important;
@@ -396,7 +366,7 @@ body::before {
     filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.9)) !important;
 }
 
-/* 🔧 文字內容 - 左側佈局 */
+/* 🔧 文字內容 - 右側佈局 */
 .bookmark-text {
     display: flex !important;
     flex-direction: column !important;
@@ -408,6 +378,7 @@ body::before {
     flex-grow: 1 !important;
     max-width: calc(100% - 70px) !important;
     z-index: 55 !important;
+    margin-left: 0 !important; /* 🔧 確保文字不會被圖標遮擋 */
 }
 
 .bookmark:hover .bookmark-text {
@@ -433,12 +404,12 @@ body::before {
     line-height: 1 !important;
 }
 
-/* 🔧 即將推出徽章 - 調整位置避免與圖標重疊 */
+/* 🔧 即將推出徽章 - 調整位置 */
 .coming-soon-badge {
     position: absolute !important;
     top: 3px !important;
-    right: 50px !important;
-    background: rgba(255, 165, 0, 1) !important; /* 完全不透明的橙色 */
+    right: 15px !important; /* 🔧 移到右側 */
+    background: rgba(255, 165, 0, 1) !important;
     color: white !important;
     font-size: 0.6rem !important;
     padding: 3px 8px !important;
@@ -461,25 +432,6 @@ body::before {
         opacity: 1 !important; 
         transform: scale(1.05) !important;
     }
-}
-
-/* 🔧 強制移除任何可能造成透明的效果 */
-.bookmark-tab,
-.bookmark-tab * {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    mix-blend-mode: normal !important;
-    filter: none !important;
-}
-
-/* 🔧 超強層級保護 - 確保書籤永遠在書本之上 */
-.bookmark {
-    isolation: isolate !important;
-}
-
-.bookmark-tab {
-    contain: layout style paint !important;
-    transform: translateZ(0) !important;
 }
 
 /* 🔧 響應式修復 */
@@ -513,7 +465,7 @@ body::before {
     
     .bookmark-icon {
         font-size: 1.6rem !important;
-        right: 12px !important;
+        left: 12px !important;
         z-index: 60 !important;
     }
     
@@ -523,7 +475,7 @@ body::before {
     }
     
     .coming-soon-badge {
-        right: 45px !important;
+        right: 12px !important;
         font-size: 0.55rem !important;
         padding: 2px 6px !important;
         z-index: 65 !important;
@@ -560,7 +512,7 @@ body::before {
     
     .bookmark-icon {
         font-size: 1.4rem !important;
-        right: 10px !important;
+        left: 10px !important;
         z-index: 60 !important;
     }
     
@@ -578,7 +530,7 @@ body::before {
     }
     
     .coming-soon-badge {
-        right: 40px !important;
+        right: 10px !important;
         font-size: 0.5rem !important;
         padding: 1px 5px !important;
         top: 2px !important;
@@ -603,7 +555,7 @@ body::before {
     }
     
     .bookmark:active {
-        box-shadow: -8px 0 25px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 3px 0 25px rgba(0, 0, 0, 0.6) !important;
     }
 }
 
@@ -616,127 +568,25 @@ body::before {
     z-index: 100 !important;
 }
 
-/* 🔧 性能優化 */
-.bookmark,
-.bookmark-tab,
-.bookmark-icon,
-.bookmark-text {
-    transform: translateZ(0) !important;
-    backface-visibility: hidden !important;
-    will-change: transform !important;
-}
-
-/* 🔧 額外的視覺確認 */
-.bookmark:hover .bookmark-tab {
-    filter: brightness(1.05) saturate(1.1) !important;
-}
-
-/* 🔧 終極保險：針對每個顏色的強制設定 */
-.bookmark-color-1 .bookmark-tab,
-.bookmark-color-1 .bookmark-tab::before,
-.bookmark-color-1 .bookmark-tab::after { 
-    background: #FF4757 !important; 
-    background-color: #FF4757 !important;
-}
-
-.bookmark-color-2 .bookmark-tab,
-.bookmark-color-2 .bookmark-tab::before,
-.bookmark-color-2 .bookmark-tab::after { 
-    background: #2ED573 !important; 
-    background-color: #2ED573 !important;
-}
-
-.bookmark-color-3 .bookmark-tab,
-.bookmark-color-3 .bookmark-tab::before,
-.bookmark-color-3 .bookmark-tab::after { 
-    background: #3742FA !important; 
-    background-color: #3742FA !important;
-}
-
-.bookmark-color-4 .bookmark-tab,
-.bookmark-color-4 .bookmark-tab::before,
-.bookmark-color-4 .bookmark-tab::after { 
-    background: #2F3542 !important; 
-    background-color: #2F3542 !important;
-}
-
-.bookmark-color-5 .bookmark-tab,
-.bookmark-color-5 .bookmark-tab::before,
-.bookmark-color-5 .bookmark-tab::after { 
-    background: #FFA502 !important; 
-    background-color: #FFA502 !important;
-}
-
-.bookmark-color-6 .bookmark-tab,
-.bookmark-color-6 .bookmark-tab::before,
-.bookmark-color-6 .bookmark-tab::after { 
-    background: #A4B0BE !important; 
-    background-color: #A4B0BE !important;
-}
-
-.bookmark-color-7 .bookmark-tab,
-.bookmark-color-7 .bookmark-tab::before,
-.bookmark-color-7 .bookmark-tab::after { 
-    background: #FF3838 !important; 
-    background-color: #FF3838 !important;
-}
-
-.bookmark-color-8 .bookmark-tab,
-.bookmark-color-8 .bookmark-tab::before,
-.bookmark-color-8 .bookmark-tab::after { 
-    background: #8B5CF6 !important; 
-    background-color: #8B5CF6 !important;
-}
-
-/* 🔧 確保書籤內容永遠在最前 */
-.bookmark * {
-    z-index: inherit !important;
-}
-
-.bookmark-icon,
-.bookmark-text,
-.coming-soon-badge {
-    position: relative !important;
-    z-index: 60 !important;
-}
-
-/* 🔧 調試模式 - 如果需要檢查層級問題 */
-/*
-.book-container {
-    border: 3px solid red !important;
-}
-.book {
-    border: 3px solid blue !important;
-}
-.bookmarks-container {
-    border: 3px solid green !important;
-}
-.bookmark {
-    border: 2px solid yellow !important;
-}
-*/
-
-
-
-
-/* 🔧 模態框背景遮罩 */
+/* 🔧 確保模態框背景遮罩層級最高 */
 .modal {
-    display: none !important; /* 預設隱藏 */
+    display: none !important;
     position: fixed !important;
-    z-index: 9999 !important; /* 超高層級，確保在所有元素之上 */
+    z-index: 99999 !important; /* 🔧 確保模態框在最上層 */
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background-color: rgba(0, 0, 0, 0.8) !important; /* 半透明黑色背景 */
-    backdrop-filter: blur(5px) !important; /* 背景模糊效果 */
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(5px) !important;
     animation: modalFadeIn 0.3s ease !important;
 }
 
 /* 🔧 模態框顯示狀態 */
 .modal.show,
-.modal[style*="display: block"] {
-    display: flex !important; /* 使用 flex 置中 */
+.modal[style*="display: block"],
+.modal[style*="display: flex"] {
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     visibility: visible !important;
@@ -746,7 +596,7 @@ body::before {
 /* 🔧 模態框內容容器 */
 .modal-content {
     background: linear-gradient(145deg, #ffffff, #f8f9fa) !important;
-    margin: 0 !important; /* 移除自動邊距 */
+    margin: 0 !important;
     padding: 2.5rem !important;
     border-radius: 20px !important;
     width: 90% !important;
@@ -759,8 +609,9 @@ body::before {
         inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
     position: relative !important;
     animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    border: 2px solid rgba(255, 215, 0, 0.3) !important; /* 金色邊框 */
-    transform: translateZ(0) !important; /* 硬體加速 */
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    transform: translateZ(0) !important;
+    z-index: 100000 !important; /* 🔧 確保內容在遮罩之上 */
 }
 
 /* 🔧 模態框圖標 */
@@ -835,30 +686,6 @@ body::before {
         inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
-.modal-buttons button:focus {
-    outline: 3px solid rgba(255, 215, 0, 0.5) !important;
-    outline-offset: 2px !important;
-}
-
-/* 🔧 按鈕波紋效果 */
-.modal-buttons button::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    width: 0 !important;
-    height: 0 !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.4) !important;
-    transform: translate(-50%, -50%) !important;
-    transition: width 0.6s, height 0.6s !important;
-}
-
-.modal-buttons button:active::before {
-    width: 300px !important;
-    height: 300px !important;
-}
-
 /* 🔧 動畫定義 */
 @keyframes modalFadeIn {
     from { 
@@ -922,74 +749,6 @@ body::before {
     }
 }
 
-/* 🔧 響應式設計 */
-@media (max-width: 768px) {
-    .modal-content {
-        width: 95% !important;
-        max-width: 400px !important;
-        padding: 2rem !important;
-        margin: 1rem !important;
-    }
-    
-    .modal-icon {
-        font-size: 3rem !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    .modal-content h3 {
-        font-size: 1.4rem !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    .modal-content p {
-        font-size: 1rem !important;
-        margin-bottom: 1.5rem !important;
-    }
-    
-    .modal-buttons button {
-        padding: 0.8rem 2rem !important;
-        font-size: 0.9rem !important;
-        min-width: 100px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-content {
-        width: 98% !important;
-        max-width: 350px !important;
-        padding: 1.5rem !important;
-        margin: 0.5rem !important;
-        border-radius: 15px !important;
-    }
-    
-    .modal-icon {
-        font-size: 2.5rem !important;
-    }
-    
-    .modal-content h3 {
-        font-size: 1.2rem !important;
-    }
-    
-    .modal-content p {
-        font-size: 0.9rem !important;
-    }
-    
-    .modal-buttons {
-        flex-direction: column !important;
-        gap: 0.8rem !important;
-    }
-    
-    .modal-buttons button {
-        width: 100% !important;
-        padding: 0.8rem 1rem !important;
-    }
-}
-
-/* 🔧 確保模態框在所有元素之上 */
-.modal {
-    z-index: 99999 !important;
-}
-
 /* 🔧 防止背景滾動 */
 body.modal-open {
     overflow: hidden !important;
@@ -997,53 +756,29 @@ body.modal-open {
     width: 100% !important;
 }
 
-/* 🔧 無障礙支援 */
-.modal[aria-hidden="true"] {
-    display: none !important;
+/* 🔧 版本資訊樣式 */
+.version-info {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    text-align: center;
+    z-index: 1;
 }
 
-.modal[aria-hidden="false"] {
-    display: flex !important;
+.version-info p {
+    margin: 0;
+    padding: 5px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
 }
 
-/* 🔧 高對比模式支援 */
-@media (prefers-contrast: high) {
-    .modal-content {
-        border: 3px solid #000 !important;
-        background: #fff !important;
-    }
-    
-    .modal-buttons button {
-        border: 2px solid #000 !important;
-        background: #000 !important;
-        color: #fff !important;
+@media (max-width: 768px) {
+    .version-info {
+        bottom: 15px;
+        font-size: 0.7rem;
     }
 }
-
-/* 🔧 減少動畫偏好支援 */
-@media (prefers-reduced-motion: reduce) {
-    .modal,
-    .modal-content,
-    .modal-icon,
-    .modal-buttons button {
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    .modal-buttons button:hover {
-        transform: none !important;
-    }
-}
-
-/* 🔧 調試模式（開發時取消註釋） */
-/*
-.modal {
-    border: 3px solid red !important;
-}
-.modal-content {
-    border: 3px solid blue !important;
-}
-.modal-buttons {
-    border: 2px solid green !important;
-}
-*/
