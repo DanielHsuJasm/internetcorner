@@ -87,13 +87,28 @@
                                placeholder="例如: {{ current_year }}">
                     </div>
                     
-                    <!-- 🔧 新增生日日期欄位 -->
+                    <!-- 🎂 美化後的生日日期欄位 -->
                     <div class="form-group">
-                        <label for="birthday-date">生日日期</label>
-                        <input type="text" id="birthday-date" name="birthday_date" 
-                               pattern="[0-1][0-9]-[0-3][0-9]"
-                               placeholder="MM-DD (例如: 01-01 或 06-26)"
-                               title="請輸入 MM-DD 格式，例如 01-01">
+                        <label for="birthday-date" class="date-label">
+                            <span class="label-text">生日日期</span>
+                            <span class="label-icon">📅</span>
+                        </label>
+                        <div class="date-input-container">
+                            <input type="text" id="birthday-date" name="birthday_date" 
+                                   pattern="(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])"
+                                   placeholder="MM-DD"
+                                   title="請輸入月份-日期格式，例如 01-01 或 06-26"
+                                   maxlength="5"
+                                   autocomplete="off">
+                            <div class="date-examples">
+                                <span class="example-item" data-date="01-01">元旦 🎊</span>
+                                <span class="example-item" data-date="06-26">6/26 🎈</span>
+                                <span class="example-item" data-date="12-25">聖誕 🎄</span>
+                            </div>
+                        </div>
+                        <div class="date-help">
+                            <small>💡 點擊上方快速選擇，或手動輸入 MM-DD 格式</small>
+                        </div>
                     </div>
                     
                     <div class="form-group full-width">
