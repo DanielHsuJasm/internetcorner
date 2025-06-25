@@ -47,11 +47,23 @@ def upload():
     
     files = request.files.getlist('photos')
     birthday_year = request.form.get('birthday_year', type=int)
+    birthday_date = request.form.get('birthday_date', '').strip()  # 🔧 新增生日日期欄位
     description = request.form.get('description', '').strip()
     
     # 如果沒有指定年份，使用當前年份
     if not birthday_year:
         birthday_year = datetime.now().year
+    
+    # 🔧 如果沒有指定生日日期，使用預設值
+    if not birthday_date:
+        birthday_date = "01-01"  # 預設為1月1日
+    
+    # 🔧 驗證生日日期格式 (MM-DD)
+    try:
+        datetime.strptime(birthday_date, '%m-%d')
+    except ValueError:
+        flash('生日日期格式錯誤，請使用 MM-DD 格式（例如：01-01）', 'error')
+        return redirect(url_for('birthday.index'))
     
     uploaded_count = 0
     for file in files:
@@ -60,6 +72,7 @@ def upload():
                 save_birthday_photo(
                     file, 
                     birthday_year=birthday_year,
+                    birthday_date=birthday_date,  # 🔧 傳遞生日日期
                     description=description if description else None
                 )
                 uploaded_count += 1

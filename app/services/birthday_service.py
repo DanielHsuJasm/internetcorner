@@ -4,7 +4,7 @@ from ..models import BirthPhoto
 from flask import current_app
 from datetime import datetime
 
-def save_birthday_photo(file_storage, birthday_year=None, description=None):
+def save_birthday_photo(file_storage, birthday_year=None, birthday_date=None, description=None):
     """保存生日照片"""
     filename = file_storage.filename
     if not allowed_file(filename):
@@ -18,10 +18,17 @@ def save_birthday_photo(file_storage, birthday_year=None, description=None):
     if birthday_year is None:
         birthday_year = datetime.now().year
     
+    # 🔧 修復：如果沒有指定生日日期，使用預設值
+    if birthday_date is None:
+        # 可以根據年份或其他邏輯設定預設生日日期
+        # 這裡使用一個通用的預設值
+        birthday_date = "01-01"  # 預設為1月1日
+    
     birth_photo = BirthPhoto(
         object_key=object_key, 
         url=url,
         birthday_year=birthday_year,
+        birthday_date=birthday_date,  # 🔧 確保不為 None
         description=description
     )
     db.session.add(birth_photo)
