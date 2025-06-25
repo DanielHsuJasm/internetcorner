@@ -1,6 +1,6 @@
 /**
- * 🔧 修復版 home.js - 書籤完全隱藏在書底下，懸停時才顯示
- * 主要修復：書籤預設完全隱藏，滑鼠懸停書本時才顯示書籤，懸停書籤時顯示文字
+ * 🔧 修復版 home.js - 解決手機平板書籤點擊問題
+ * 主要修復：觸摸事件處理、指針事件管理、響應式交互優化
  */
 
 class BookmarkSystem {
@@ -11,6 +11,9 @@ class BookmarkSystem {
         this.isInitialized = false;
         this.modalManager = null;
         this.soundSystem = null;
+        this.isMobile = false;
+        this.touchStartTime = 0;
+        this.touchStartPosition = { x: 0, y: 0 };
         
         this.init();
     }
@@ -31,6 +34,9 @@ class BookmarkSystem {
      */
     setup() {
         try {
+            // 檢測設備類型
+            this.detectDeviceType();
+            
             // 獲取DOM元素
             this.bookContainer = document.querySelector('.book-container');
             this.bookmarksContainer = document.querySelector('.bookmarks-container');
@@ -53,10 +59,28 @@ class BookmarkSystem {
             this.setupSoundSystem();
             
             this.isInitialized = true;
-            console.log('📚 書籤系統初始化完成！(修復版 - 完全隱藏)');
+            console.log('📚 書籤系統初始化完成！(修復版 - 觸摸優化)');
             
         } catch (error) {
             console.error('📚 書籤系統初始化失敗:', error);
+        }
+    }
+    
+    /**
+     * 🔧 檢測設備類型
+     */
+    detectDeviceType() {
+        this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        this.isTablet = this.isMobile && window.innerWidth >= 768 && window.innerWidth <= 1024;
+        this.isPhone = this.isMobile && window.innerWidth < 768;
+        
+        console.log(`📱 設備檢測: 手機=${this.isPhone}, 平板=${this.isTablet}, 觸摸設備=${this.isMobile}`);
+        
+        // 添加設備類型到 body
+        if (this.isMobile) {
+            document.body.classList.add('touch-device');
+            if (this.isPhone) document.body.classList.add('mobile-device');
+            if (this.isTablet) document.body.classList.add('tablet-device');
         }
     }
     
@@ -70,12 +94,14 @@ class BookmarkSystem {
             this.bookmarksContainer.style.opacity = '0'; // 完全透明
             this.bookmarksContainer.style.zIndex = '1'; // 在書本之下
             this.bookmarksContainer.style.pointerEvents = 'none'; // 預設不可點擊
+            this.bookmarksContainer.style.transition = 'right 0.4s ease, opacity 0.4s ease, z-index 0s ease 0.2s';
         }
         
         // 🔧 所有書籤預設狀態
         this.bookmarks.forEach((bookmark, index) => {
             const text = bookmark.querySelector('.bookmark-text');
             const icon = bookmark.querySelector('.bookmark-icon');
+            const tab = bookmark.querySelector('.bookmark-tab');
             const badge = bookmark.querySelector('.coming-soon-badge');
             
             // 🔧 文字預設完全隱藏
@@ -96,14 +122,21 @@ class BookmarkSystem {
                 icon.style.position = 'relative';
             }
             
+            // 🔧 書籤標籤設置指針事件
+            if (tab) {
+                tab.style.pointerEvents = 'auto';
+                tab.style.cursor = 'pointer';
+            }
+            
             // 🔧 徽章預設顯示但跟隨容器透明度
             if (badge) {
-                badge.style.opacity = '1'; // 徽章本身不透明
+                badge.style.opacity = '1';
                 badge.style.position = 'absolute';
                 badge.style.top = '-8px';
-                badge.style.right = '-5px'; // 與綠色書籤相同位置
+                badge.style.right = '-5px';
                 badge.style.transform = 'translateX(0)';
                 badge.style.zIndex = '10002';
+                badge.style.pointerEvents = 'none'; // 徽章不響應點擊
             }
             
             // 🔧 書籤基本狀態
@@ -112,6 +145,7 @@ class BookmarkSystem {
             bookmark.style.zIndex = '11';
             bookmark.style.position = 'relative';
             bookmark.style.pointerEvents = 'auto'; // 書籤本身可點擊
+            bookmark.style.cursor = 'pointer';
             
             console.log(`📑 書籤 ${index + 1} 初始狀態已設置`);
         });
@@ -137,80 +171,232 @@ class BookmarkSystem {
             bookmark.setAttribute('role', 'button');
             bookmark.setAttribute('aria-label', `書籤: ${bookmark.dataset.bookmarkId}`);
             
+            // 🔧 添加觸摸友好的樣式
+            if (this.isMobile) {
+                bookmark.style.minHeight = '48px'; // 符合 WCAG 觸摸目標大小
+                bookmark.style.minWidth = '48px';
+                tab.style.minHeight = '48px';
+                tab.style.padding = '8px 20px 8px 15px';
+            }
+            
             console.log(`📑 書籤 ${index + 1} 結構已設置`);
         });
     }
     
     /**
-     * 🔧 設置書籤事件
+     * 🔧 設置書籤事件 - 優化觸摸支持
      */
     setupBookmarkEvents() {
-        // 🔧 書本懸停事件 - 顯示/隱藏書籤容器
+        // 🔧 書本觸摸/懸停事件
         if (this.bookContainer) {
-            this.bookContainer.addEventListener('mouseenter', () => {
-                this.showBookmarksContainer();
-            });
-            
-            this.bookContainer.addEventListener('mouseleave', () => {
-                this.hideBookmarksContainer();
-            });
+            if (this.isMobile) {
+                // 移動設備：觸摸事件
+                this.setupMobileBookEvents();
+            } else {
+                // 桌面設備：鼠標事件
+                this.setupDesktopBookEvents();
+            }
         }
         
         // 🔧 書籤個別事件
         this.bookmarks.forEach((bookmark) => {
             const isEnabled = bookmark.dataset.enabled === 'true';
             
-            // 點擊事件
-            bookmark.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleBookmarkClick(bookmark, isEnabled);
-            });
-            
-            // 🔧 書籤懸停事件 - 顯示文字
-            bookmark.addEventListener('mouseenter', () => {
-                this.handleBookmarkHover(bookmark, true);
-                if (this.soundSystem) {
-                    this.soundSystem.playHoverSound();
-                }
-            });
-            
-            bookmark.addEventListener('mouseleave', () => {
-                this.handleBookmarkHover(bookmark, false);
-            });
-            
-            // 🔧 觸摸事件
-            let touchTimeout;
-            bookmark.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                bookmark.classList.add('touch-active');
-                this.handleBookmarkHover(bookmark, true);
-                
-                // 觸摸震動反饋
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
-                
-                clearTimeout(touchTimeout);
-                touchTimeout = setTimeout(() => {
-                    bookmark.classList.remove('touch-active');
-                    this.handleBookmarkHover(bookmark, false);
-                }, 3000);
-            });
-            
-            bookmark.addEventListener('touchend', () => {
-                clearTimeout(touchTimeout);
-            });
-            
-            // 鍵盤事件
-            bookmark.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.handleBookmarkClick(bookmark, isEnabled);
-                }
-            });
+            if (this.isMobile) {
+                this.setupMobileBookmarkEvents(bookmark, isEnabled);
+            } else {
+                this.setupDesktopBookmarkEvents(bookmark, isEnabled);
+            }
         });
         
-        console.log('📑 書籤事件已設置 (修復版)');
+        console.log('📑 書籤事件已設置 (觸摸優化版)');
+    }
+    
+    /**
+     * 🔧 設置桌面設備書本事件
+     */
+    setupDesktopBookEvents() {
+        this.bookContainer.addEventListener('mouseenter', () => {
+            this.showBookmarksContainer();
+        });
+        
+        this.bookContainer.addEventListener('mouseleave', () => {
+            this.hideBookmarksContainer();
+        });
+    }
+    
+    /**
+     * 🔧 設置移動設備書本事件
+     */
+    setupMobileBookEvents() {
+        let bookTouchTimer;
+        
+        this.bookContainer.addEventListener('touchstart', (e) => {
+            clearTimeout(bookTouchTimer);
+            this.touchStartTime = Date.now();
+            this.touchStartPosition = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+            
+            // 短暫觸摸顯示書籤
+            bookTouchTimer = setTimeout(() => {
+                this.showBookmarksContainer();
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 300);
+        });
+        
+        this.bookContainer.addEventListener('touchend', (e) => {
+            clearTimeout(bookTouchTimer);
+            const touchDuration = Date.now() - this.touchStartTime;
+            
+            if (touchDuration < 300) {
+                // 快速點擊：切換書籤顯示
+                if (this.bookmarksContainer.style.opacity === '1') {
+                    this.hideBookmarksContainer();
+                } else {
+                    this.showBookmarksContainer();
+                }
+            }
+        });
+        
+        this.bookContainer.addEventListener('touchmove', (e) => {
+            clearTimeout(bookTouchTimer);
+        });
+        
+        // 點擊書本外部區域隱藏書籤
+        document.addEventListener('touchstart', (e) => {
+            if (!this.bookContainer.contains(e.target) && 
+                !this.bookmarksContainer.contains(e.target)) {
+                this.hideBookmarksContainer();
+            }
+        });
+    }
+    
+    /**
+     * 🔧 設置桌面設備書籤事件
+     */
+    setupDesktopBookmarkEvents(bookmark, isEnabled) {
+        // 點擊事件
+        bookmark.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.handleBookmarkClick(bookmark, isEnabled);
+        });
+        
+        // 懸停事件
+        bookmark.addEventListener('mouseenter', () => {
+            this.handleBookmarkHover(bookmark, true);
+            if (this.soundSystem) {
+                this.soundSystem.playHoverSound();
+            }
+        });
+        
+        bookmark.addEventListener('mouseleave', () => {
+            this.handleBookmarkHover(bookmark, false);
+        });
+        
+        // 鍵盤事件
+        bookmark.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.handleBookmarkClick(bookmark, isEnabled);
+            }
+        });
+    }
+    
+    /**
+     * 🔧 設置移動設備書籤事件
+     */
+    setupMobileBookmarkEvents(bookmark, isEnabled) {
+        let touchTimer;
+        let touchStartTime;
+        let touchStartPos;
+        let isLongPress = false;
+        
+        // 🔧 觸摸開始
+        bookmark.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 防止默認行為
+            e.stopPropagation();
+            
+            touchStartTime = Date.now();
+            touchStartPos = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+            isLongPress = false;
+            
+            // 立即顯示視覺反饋
+            bookmark.classList.add('touch-active');
+            this.handleBookmarkHover(bookmark, true);
+            
+            // 長按檢測
+            touchTimer = setTimeout(() => {
+                isLongPress = true;
+                if (navigator.vibrate) navigator.vibrate(100);
+                console.log('📱 長按檢測到:', bookmark.dataset.bookmarkId);
+            }, 500);
+            
+            console.log('📱 觸摸開始:', bookmark.dataset.bookmarkId);
+        });
+        
+        // 🔧 觸摸移動
+        bookmark.addEventListener('touchmove', (e) => {
+            if (!touchStartPos) return;
+            
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+            const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+            
+            // 如果移動距離超過閾值，取消觸摸
+            if (deltaX > 10 || deltaY > 10) {
+                clearTimeout(touchTimer);
+                bookmark.classList.remove('touch-active');
+                this.handleBookmarkHover(bookmark, false);
+                console.log('📱 觸摸移動取消:', bookmark.dataset.bookmarkId);
+            }
+        });
+        
+        // 🔧 觸摸結束
+        bookmark.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            clearTimeout(touchTimer);
+            bookmark.classList.remove('touch-active');
+            
+            const touchDuration = Date.now() - touchStartTime;
+            
+            if (!isLongPress && touchDuration < 500) {
+                // 短按：執行點擊
+                console.log('📱 短按點擊:', bookmark.dataset.bookmarkId);
+                this.handleBookmarkClick(bookmark, isEnabled);
+                
+                // 點擊後短暫保持高亮
+                setTimeout(() => {
+                    this.handleBookmarkHover(bookmark, false);
+                }, 500);
+            } else {
+                // 長按或其他情況
+                this.handleBookmarkHover(bookmark, false);
+            }
+        });
+        
+        // 🔧 觸摸取消
+        bookmark.addEventListener('touchcancel', (e) => {
+            clearTimeout(touchTimer);
+            bookmark.classList.remove('touch-active');
+            this.handleBookmarkHover(bookmark, false);
+            console.log('📱 觸摸取消:', bookmark.dataset.bookmarkId);
+        });
+        
+        // 🔧 為移動設備添加點擊事件作為備用
+        bookmark.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('📱 備用點擊事件:', bookmark.dataset.bookmarkId);
+            this.handleBookmarkClick(bookmark, isEnabled);
+        });
     }
     
     /**
@@ -218,10 +404,13 @@ class BookmarkSystem {
      */
     showBookmarksContainer() {
         if (this.bookmarksContainer) {
-            this.bookmarksContainer.style.right = '-80px'; // 顯示位置
-            this.bookmarksContainer.style.opacity = '1'; // 完全不透明
-            this.bookmarksContainer.style.zIndex = '10'; // 提高到書本之上
-            this.bookmarksContainer.style.pointerEvents = 'auto'; // 可點擊
+            const rightPosition = this.isMobile ? 
+                (this.isPhone ? '-40px' : '-60px') : '-80px';
+            
+            this.bookmarksContainer.style.right = rightPosition;
+            this.bookmarksContainer.style.opacity = '1';
+            this.bookmarksContainer.style.zIndex = '10';
+            this.bookmarksContainer.style.pointerEvents = 'auto';
             this.bookmarksContainer.style.transition = 'right 0.4s ease, opacity 0.4s ease, z-index 0s ease';
         }
         
@@ -231,7 +420,7 @@ class BookmarkSystem {
             book.style.transform = 'translateY(-5px) scale(1.02)';
         }
         
-        console.log('📚 書籤容器已顯示');
+        console.log('📚 書籤容器已顯示 (移動優化)');
     }
     
     /**
@@ -239,15 +428,14 @@ class BookmarkSystem {
      */
     hideBookmarksContainer() {
         if (this.bookmarksContainer) {
-            this.bookmarksContainer.style.right = '-200px'; // 完全隱藏
-            this.bookmarksContainer.style.opacity = '0'; // 完全透明
+            this.bookmarksContainer.style.right = '-200px';
+            this.bookmarksContainer.style.opacity = '0';
             this.bookmarksContainer.style.transition = 'right 0.4s ease, opacity 0.4s ease, z-index 0s ease 0.2s';
             
-            // 延遲降低層級，讓動畫完成
             setTimeout(() => {
                 if (this.bookmarksContainer) {
-                    this.bookmarksContainer.style.zIndex = '1'; // 降低到書本之下
-                    this.bookmarksContainer.style.pointerEvents = 'none'; // 不可點擊
+                    this.bookmarksContainer.style.zIndex = '1';
+                    this.bookmarksContainer.style.pointerEvents = 'none';
                 }
             }, 200);
         }
@@ -258,9 +446,10 @@ class BookmarkSystem {
             book.style.transform = '';
         }
         
-        // 🔧 隱藏所有書籤文字
+        // 隱藏所有書籤文字
         this.bookmarks.forEach(bookmark => {
             this.handleBookmarkHover(bookmark, false);
+            bookmark.classList.remove('touch-active');
         });
         
         console.log('📚 書籤容器已隱藏');
@@ -274,8 +463,11 @@ class BookmarkSystem {
         const icon = bookmark.querySelector('.bookmark-icon');
         
         if (isHovering) {
-            // 🔧 懸停進入 - 書籤滑出，顯示文字，最高層級
-            bookmark.style.transform = 'translateX(50px)';
+            // 懸停進入 - 書籤滑出，顯示文字，最高層級
+            const slideDistance = this.isMobile ? 
+                (this.isPhone ? '30px' : '40px') : '50px';
+            
+            bookmark.style.transform = `translateX(${slideDistance})`;
             bookmark.style.opacity = '1';
             bookmark.style.zIndex = '9999';
             bookmark.style.position = 'relative';
@@ -285,7 +477,7 @@ class BookmarkSystem {
                 text.style.transform = 'translateX(0)';
                 text.style.zIndex = '10001';
                 text.style.position = 'relative';
-                text.style.pointerEvents = 'auto'; // 懸停時可點擊
+                text.style.pointerEvents = 'auto';
             }
             
             if (icon) {
@@ -297,7 +489,7 @@ class BookmarkSystem {
             
             console.log('📑 書籤懸停：文字已顯示', bookmark.dataset.bookmarkId);
         } else {
-            // 🔧 懸停離開 - 書籤回位，隱藏文字，回到正常層級
+            // 懸停離開 - 書籤回位，隱藏文字
             bookmark.style.transform = 'translateX(0)';
             bookmark.style.opacity = '0.8';
             bookmark.style.zIndex = '11';
@@ -306,7 +498,7 @@ class BookmarkSystem {
                 text.style.opacity = '0';
                 text.style.transform = 'translateX(-20px)';
                 text.style.zIndex = '10000';
-                text.style.pointerEvents = 'none'; // 隱藏時不可點擊
+                text.style.pointerEvents = 'none';
             }
             
             if (icon) {
@@ -324,10 +516,15 @@ class BookmarkSystem {
         const bookmarkId = bookmark.dataset.bookmarkId;
         const title = bookmark.dataset.title || bookmarkId;
         
+        console.log(`🔧 書籤點擊處理: ${bookmarkId}, 啟用狀態: ${isEnabled}`);
+        
         // 播放點擊音效
         if (this.soundSystem) {
             this.soundSystem.playClickSound();
         }
+        
+        // 視覺反饋
+        this.showClickFeedback(bookmark);
         
         if (isEnabled) {
             const route = bookmark.dataset.route;
@@ -339,17 +536,28 @@ class BookmarkSystem {
         } else {
             this.showComingSoon(title);
         }
+    }
+    
+    /**
+     * 🔧 顯示點擊反饋
+     */
+    showClickFeedback(bookmark) {
+        // 快速滑出再恢復的動畫
+        const originalTransform = bookmark.style.transform;
+        const slideDistance = this.isMobile ? '35px' : '55px';
         
-        // 🔧 點擊動畫 - 快速滑出再恢復
-        bookmark.style.transform = 'translateX(55px) scale(0.95)';
+        bookmark.style.transform = `translateX(${slideDistance}) scale(0.95)`;
         bookmark.style.transition = 'transform 0.15s ease';
         
         setTimeout(() => {
-            bookmark.style.transform = '';
+            bookmark.style.transform = originalTransform;
             bookmark.style.transition = '';
         }, 150);
         
-        console.log(`📑 書籤點擊: ${bookmarkId}`);
+        // 觸覺反饋
+        if (this.isMobile && navigator.vibrate) {
+            navigator.vibrate(75);
+        }
     }
     
     /**
@@ -390,7 +598,7 @@ class BookmarkSystem {
     }
     
     /**
-     * 🔧 設置鍵盤導航
+     * 設置鍵盤導航
      */
     setupKeyboardNavigation() {
         let currentIndex = -1;
@@ -447,7 +655,7 @@ class BookmarkSystem {
     }
     
     /**
-     * 🔧 高亮顯示書籤
+     * 高亮顯示書籤
      */
     highlightBookmark(bookmark) {
         // 先顯示書籤容器
@@ -456,7 +664,7 @@ class BookmarkSystem {
         // 清除其他高亮
         this.clearHighlight();
         
-        // 🔧 高亮當前書籤
+        // 高亮當前書籤
         bookmark.style.outline = '2px solid var(--gold)';
         bookmark.style.outlineOffset = '2px';
         bookmark.style.transform = 'translateX(50px)';
@@ -482,7 +690,7 @@ class BookmarkSystem {
     }
     
     /**
-     * 🔧 清除高亮
+     * 清除高亮
      */
     clearHighlight() {
         this.bookmarks.forEach(bookmark => {
@@ -508,60 +716,67 @@ class BookmarkSystem {
     }
     
     /**
-     * 🔧 設置觸摸支持
+     * 🔧 設置觸摸支持 - 增強版
      */
     setupTouchSupport() {
-        if ('ontouchstart' in window) {
-            document.body.classList.add('touch-device');
+        if (this.isMobile) {
+            console.log('👆 移動設備檢測到，啟用觸摸優化');
             
-            // 觸摸手勢支持
-            let touchStartX = 0;
-            let touchStartY = 0;
-            
-            this.bookContainer.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            });
-            
-            this.bookContainer.addEventListener('touchmove', (e) => {
-                if (!touchStartX || !touchStartY) return;
-                
-                const touchEndX = e.touches[0].clientX;
-                const touchEndY = e.touches[0].clientY;
-                
-                const diffX = touchStartX - touchEndX;
-                const diffY = touchStartY - touchEndY;
-                
-                // 🔧 檢測右滑手勢（顯示書籤）
-                if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
-                    this.handleSwipeRight();
+            // 添加觸摸樣式
+            const touchStyle = document.createElement('style');
+            touchStyle.id = 'touch-device-styles';
+            touchStyle.textContent = `
+                .touch-device .bookmark {
+                    -webkit-tap-highlight-color: transparent;
+                    -webkit-touch-callout: none;
+                    -webkit-user-select: none;
+                    user-select: none;
                 }
-                // 檢測左滑手勢（隱藏書籤）
-                else if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50) {
-                    this.handleSwipeLeft();
+                
+                .touch-device .bookmark.touch-active {
+                    background: rgba(255, 215, 0, 0.1);
+                    transform: translateX(35px) scale(1.05) !important;
+                    opacity: 1 !important;
+                    z-index: 9999 !important;
                 }
-            });
+                
+                .touch-device .bookmark-tab {
+                    min-height: 48px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                
+                @media (max-width: 768px) {
+                    .touch-device .bookmark {
+                        height: 48px;
+                    }
+                    
+                    .touch-device .bookmark-icon {
+                        font-size: 1.2rem;
+                    }
+                }
+            `;
+            document.head.appendChild(touchStyle);
             
-            console.log('👆 觸摸支持已設置');
+            // 禁用瀏覽器的觸摸滾動彈性效果
+            document.addEventListener('touchmove', (e) => {
+                if (e.target.closest('.bookmark') || e.target.closest('.bookmarks-container')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // 處理方向變化
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    this.detectDeviceType();
+                    this.hideBookmarksContainer();
+                    console.log('📱 方向變化，重新初始化觸摸支持');
+                }, 300);
+            });
         }
-    }
-    
-    /**
-     * 🔧 處理右滑手勢
-     */
-    handleSwipeRight() {
-        this.showBookmarksContainer();
         
-        setTimeout(() => {
-            this.hideBookmarksContainer();
-        }, 3000);
-    }
-    
-    /**
-     * 🔧 處理左滑手勢
-     */
-    handleSwipeLeft() {
-        this.hideBookmarksContainer();
+        console.log('👆 觸摸支持已設置');
     }
     
     /**
@@ -817,7 +1032,9 @@ class BookmarkSystem {
             ).length,
             hasModalManager: !!this.modalManager,
             hasSoundSystem: !!this.soundSystem,
-            isTouchDevice: 'ontouchstart' in window,
+            isTouchDevice: this.isMobile,
+            isPhone: this.isPhone,
+            isTablet: this.isTablet,
             prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
         };
     }
@@ -852,6 +1069,12 @@ class BookmarkSystem {
         
         if (this.soundSystem) {
             this.soundSystem.destroy();
+        }
+        
+        // 清除觸摸樣式
+        const touchStyles = document.getElementById('touch-device-styles');
+        if (touchStyles) {
+            touchStyles.remove();
         }
         
         this.isInitialized = false;
@@ -1136,28 +1359,92 @@ let bookmarkSystem = null;
 
 // 初始化所有系統
 function initializeApp() {
-    console.log('🚀 開始初始化 InternetCorner 系統...');
+    console.log('🚀 開始初始化 InternetCorner 系統 (觸摸優化版)...');
     
     try {
         // 初始化書籤系統
         bookmarkSystem = new BookmarkSystem();
         
         // 用戶首次交互後啟用音效
-        document.addEventListener('click', () => {
+        const enableAudio = () => {
             if (bookmarkSystem && bookmarkSystem.soundSystem && bookmarkSystem.soundSystem.audioContext) {
                 if (bookmarkSystem.soundSystem.audioContext.state === 'suspended') {
                     bookmarkSystem.soundSystem.audioContext.resume();
                 }
             }
-        }, { once: true });
+        };
         
-        console.log('✨ InternetCorner 系統初始化完成！(修復版 - 完全隱藏書籤)');
+        document.addEventListener('click', enableAudio, { once: true });
+        document.addEventListener('touchend', enableAudio, { once: true });
+        
+        console.log('✨ InternetCorner 系統初始化完成！(觸摸優化版)');
         
         // 標記頁面已準備就緒
         document.body.classList.add('app-ready');
         
+        // 🔧 移動設備特殊處理
+        if (bookmarkSystem.isMobile) {
+            console.log('📱 移動設備模式已啟用');
+            
+            // 添加移動設備專用CSS
+            const mobileCSS = document.createElement('style');
+            mobileCSS.textContent = `
+                /* 移動設備專用樣式 */
+                .touch-device .book-container {
+                    user-select: none;
+                    -webkit-user-select: none;
+                    -webkit-touch-callout: none;
+                }
+                
+                .touch-device .bookmark {
+                    min-height: 48px;
+                    min-width: 48px;
+                }
+                
+                .mobile-device .bookmarks-container {
+                    width: 180px;
+                }
+                
+                .tablet-device .bookmarks-container {
+                    width: 200px;
+                }
+                
+                /* 觸摸反饋 */
+                .touch-device .bookmark.touch-active .bookmark-tab {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+                
+                /* 防止意外縮放 */
+                .touch-device {
+                    touch-action: manipulation;
+                }
+                
+                /* 提高觸摸目標 */
+                @media (pointer: coarse) {
+                    .bookmark {
+                        min-height: 52px;
+                    }
+                    
+                    .bookmark-icon {
+                        font-size: 1.3rem;
+                    }
+                }
+            `;
+            document.head.appendChild(mobileCSS);
+        }
+        
     } catch (error) {
         console.error('❌ 系統初始化失敗:', error);
+        
+        // 錯誤回復
+        setTimeout(() => {
+            console.log('🔄 嘗試恢復系統...');
+            try {
+                bookmarkSystem = new BookmarkSystem();
+            } catch (e) {
+                console.error('❌ 系統恢復失敗:', e);
+            }
+        }, 2000);
     }
 }
 
@@ -1241,6 +1528,20 @@ window.hideBookmarks = function() {
     }
 };
 
+// 🔧 新增：觸摸調試函數
+window.debugTouch = function() {
+    if (bookmarkSystem) {
+        console.log('📱 觸摸調試資訊:', {
+            isMobile: bookmarkSystem.isMobile,
+            isPhone: bookmarkSystem.isPhone,
+            isTablet: bookmarkSystem.isTablet,
+            screenSize: `${window.innerWidth}x${window.innerHeight}`,
+            touchPoints: navigator.maxTouchPoints,
+            userAgent: navigator.userAgent
+        });
+    }
+};
+
 // ===== 頁面卸載處理 =====
 
 window.addEventListener('beforeunload', function() {
@@ -1256,7 +1557,7 @@ window.addEventListener('beforeunload', function() {
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         console.log('👁️ 頁面已隱藏');
-        // 🔧 頁面隱藏時自動隱藏書籤
+        // 頁面隱藏時自動隱藏書籤
         if (bookmarkSystem) {
             bookmarkSystem.hideBookmarksContainer();
         }
@@ -1286,7 +1587,30 @@ if ('navigator' in window && 'onLine' in navigator) {
     });
 }
 
-console.log('📚 home.js 已完全載入 (修復版 - 完全隱藏書籤)');
+// ===== 方向變化處理 =====
+
+window.addEventListener('orientationchange', function() {
+    console.log('📱 設備方向已變化');
+    setTimeout(() => {
+        if (bookmarkSystem) {
+            bookmarkSystem.detectDeviceType();
+            bookmarkSystem.hideBookmarksContainer();
+            console.log('📱 已適應新方向');
+        }
+    }, 300);
+});
+
+// ===== 觸摸性能優化 =====
+
+// 防止移動設備的彈性滾動影響交互
+document.addEventListener('touchmove', function(e) {
+    // 只在書籤區域防止滾動
+    if (e.target.closest('.book-container') || e.target.closest('.bookmarks-container')) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+console.log('📚 home.js 已完全載入 (觸摸優化版)');
 console.log('💡 可用的全域指令:');
 console.log('  getBookmarkStatus() - 查看書籤系統狀態');
 console.log('  reinitializeBookmarks() - 重新初始化書籤');
@@ -1295,4 +1619,5 @@ console.log('  toggleSound() - 切換音效開關');
 console.log('  setSoundVolume(0.5) - 設定音效音量');
 console.log('  showBookmarks() - 手動顯示書籤 (調試用)');
 console.log('  hideBookmarks() - 手動隱藏書籤 (調試用)');
-console.log('🎉 InternetCorner 準備就緒！(修復版 - 書籤完全隱藏在書底下，懸停時才顯示)');
+console.log('  debugTouch() - 觸摸調試資訊 (調試用)');
+console.log('🎉 InternetCorner 準備就緒！(觸摸優化版 - 修復手機平板點擊問題)');

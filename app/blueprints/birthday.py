@@ -83,7 +83,8 @@ def upload():
                 flash(f"上傳失敗: {file.filename}", 'error')
     
     if uploaded_count > 0:
-        flash(f'成功上傳 {uploaded_count} 張生日照片！', 'success')
+        pass
+        #flash(f'成功上傳 {uploaded_count} 張生日照片！', 'success')
     
     return redirect(url_for('birthday.index'))
 
@@ -92,7 +93,8 @@ def delete(photo_id):
     """刪除生日照片"""
     success = delete_birthday_photo(photo_id)
     if success:
-        flash('生日照片已刪除', 'success')
+        pass
+        #flash('生日照片已刪除', 'success')
     else:
         flash('找不到該照片', 'error')
     return redirect(url_for('birthday.index'))

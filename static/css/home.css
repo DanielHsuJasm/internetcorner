@@ -902,3 +902,434 @@ body.modal-open {
     -moz-user-select: none;
     -ms-user-select: none;
 }
+
+/* 🔧 手機平板觸摸優化補充樣式 */
+/* 這些樣式需要添加到現有的 home.css 文件中 */
+
+/* ===== 觸摸設備專用優化 ===== */
+.touch-device {
+    /* 防止意外縮放和選擇 */
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* ===== 書籤觸摸優化 ===== */
+.touch-device .bookmark {
+    /* 移除默認觸摸高亮 */
+    -webkit-tap-highlight-color: transparent;
+    
+    /* 確保足夠的觸摸目標大小 (WCAG 建議最小 44x44px) */
+    min-height: 48px;
+    min-width: 48px;
+    
+    /* 確保指針事件正常工作 */
+    pointer-events: auto !important;
+    
+    /* 觸摸友好的過渡效果 */
+    transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease !important;
+}
+
+.touch-device .bookmark-tab {
+    /* 確保標籤區域可點擊 */
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    
+    /* 增加內邊距以提供更大的觸摸區域 */
+    padding: 12px 20px 12px 15px !important;
+    min-height: 48px;
+    
+    /* 確保內容垂直居中 */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* ===== 觸摸激活狀態 ===== */
+.touch-device .bookmark.touch-active {
+    /* 觸摸時的視覺反饋 */
+    background: rgba(255, 215, 0, 0.1) !important;
+    transform: translateX(35px) scale(1.02) !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
+    
+    /* 確保在觸摸時可見 */
+    pointer-events: auto !important;
+}
+
+.touch-device .bookmark.touch-active .bookmark-tab {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.touch-device .bookmark.touch-active .bookmark-text {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    pointer-events: auto !important;
+}
+
+.touch-device .bookmark.touch-active .bookmark-icon {
+    transform: scale(1.1) !important;
+}
+
+/* ===== 移動設備特定尺寸 ===== */
+.mobile-device .bookmarks-container {
+    width: 160px !important;
+    gap: 4px !important;
+}
+
+.mobile-device .bookmark {
+    height: 48px !important;
+}
+
+.mobile-device .bookmark-icon {
+    font-size: 1.1rem !important;
+}
+
+.mobile-device .bookmark-title {
+    font-size: 0.75rem !important;
+}
+
+.mobile-device .bookmark-date {
+    font-size: 0.65rem !important;
+}
+
+/* ===== 平板設備特定尺寸 ===== */
+.tablet-device .bookmarks-container {
+    width: 180px !important;
+    gap: 6px !important;
+}
+
+.tablet-device .bookmark {
+    height: 50px !important;
+}
+
+.tablet-device .bookmark-icon {
+    font-size: 1.2rem !important;
+}
+
+/* ===== 高對比度和可訪問性 ===== */
+@media (prefers-contrast: high) {
+    .touch-device .bookmark.touch-active {
+        background: rgba(255, 215, 0, 0.3) !important;
+        border: 2px solid var(--gold) !important;
+    }
+}
+
+/* ===== 粗糙指針設備 (主要是觸摸屏) ===== */
+@media (pointer: coarse) {
+    .bookmark {
+        min-height: 52px !important;
+        min-width: 52px !important;
+    }
+    
+    .bookmark-tab {
+        padding: 14px 22px 14px 16px !important;
+        min-height: 52px !important;
+    }
+    
+    .bookmark-icon {
+        font-size: 1.3rem !important;
+    }
+    
+    .coming-soon-badge {
+        font-size: 0.5rem !important;
+        padding: 3px 6px !important;
+        top: -10px !important;
+        right: -6px !important;
+    }
+}
+
+/* ===== 觸摸設備的書籤容器優化 ===== */
+.touch-device .bookmarks-container {
+    /* 確保容器本身不阻擋觸摸 */
+    pointer-events: none !important;
+}
+
+.touch-device .bookmarks-container.show,
+.touch-device .book-container:hover .bookmarks-container {
+    pointer-events: auto !important;
+}
+
+/* 確保書籤在容器內可點擊 */
+.touch-device .bookmarks-container .bookmark {
+    pointer-events: auto !important;
+}
+
+/* ===== 防止觸摸時的意外滾動 ===== */
+.touch-device .book-container,
+.touch-device .bookmarks-container {
+    /* 防止過度滾動 */
+    overscroll-behavior: contain;
+}
+
+/* ===== 觸摸反饋動畫優化 ===== */
+@media (prefers-reduced-motion: no-preference) {
+    .touch-device .bookmark {
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    }
+    
+    .touch-device .bookmark.touch-active {
+        animation: touchFeedback 0.3s ease-out !important;
+    }
+}
+
+@keyframes touchFeedback {
+    0% {
+        transform: translateX(0) scale(1);
+    }
+    50% {
+        transform: translateX(40px) scale(1.05);
+    }
+    100% {
+        transform: translateX(35px) scale(1.02);
+    }
+}
+
+/* ===== 減少動畫偏好時的優化 ===== */
+@media (prefers-reduced-motion: reduce) {
+    .touch-device .bookmark {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .touch-device .bookmark.touch-active {
+        transform: translateX(35px) !important;
+    }
+}
+
+/* ===== 小螢幕設備的額外優化 ===== */
+@media (max-width: 480px) {
+    .touch-device .bookmarks-container {
+        width: 140px !important;
+        right: -150px !important;
+    }
+    
+    .touch-device .book-container:hover .bookmarks-container,
+    .touch-device .bookmarks-container.show {
+        right: -20px !important;
+    }
+    
+    .touch-device .bookmark:hover,
+    .touch-device .bookmark.touch-active {
+        transform: translateX(25px) !important;
+    }
+    
+    .touch-device .bookmark-title {
+        font-size: 0.7rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    .touch-device .bookmark-date {
+        font-size: 0.6rem !important;
+    }
+    
+    .touch-device .coming-soon-badge {
+        font-size: 0.45rem !important;
+        padding: 2px 4px !important;
+        top: -8px !important;
+        right: -4px !important;
+    }
+}
+
+/* ===== 橫屏模式優化 ===== */
+@media (orientation: landscape) and (max-height: 500px) {
+    .touch-device .bookmark {
+        height: 42px !important;
+        min-height: 42px !important;
+    }
+    
+    .touch-device .bookmark-tab {
+        padding: 8px 18px 8px 12px !important;
+        min-height: 42px !important;
+    }
+    
+    .touch-device .bookmark-icon {
+        font-size: 1rem !important;
+    }
+}
+
+/* ===== 觸摸設備的書本交互優化 ===== */
+.touch-device .book {
+    /* 確保書本可以響應觸摸 */
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.touch-device .book-cover {
+    /* 確保書本封面可以觸摸 */
+    pointer-events: auto !important;
+}
+
+/* ===== 觸摸設備的模態框優化 ===== */
+.touch-device .modal-content {
+    /* 增加觸摸友好的邊距 */
+    margin: 10px !important;
+    max-width: calc(100vw - 20px) !important;
+}
+
+.touch-device .modal-buttons button {
+    /* 確保按鈕足夠大 */
+    min-height: 48px !important;
+    min-width: 120px !important;
+    padding: 12px 24px !important;
+}
+
+/* ===== 調試模式樣式 ===== */
+.debug-touch .bookmark {
+    border: 2px dashed rgba(255, 0, 0, 0.3) !important;
+}
+
+.debug-touch .bookmark.touch-active {
+    border-color: rgba(0, 255, 0, 0.8) !important;
+}
+
+.debug-touch .bookmark-tab {
+    background: rgba(0, 0, 255, 0.1) !important;
+}
+
+/* ===== 高密度螢幕優化 ===== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .touch-device .bookmark-icon {
+        /* 在高密度螢幕上保持清晰 */
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* ===== 暗黑模式觸摸優化 ===== */
+@media (prefers-color-scheme: dark) {
+    .touch-device .bookmark.touch-active {
+        background: rgba(255, 215, 0, 0.15) !important;
+    }
+    
+    .touch-device .bookmark.touch-active .bookmark-tab {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+}
+
+/* ===== 確保層級正確性 ===== */
+.touch-device .bookmark {
+    position: relative !important;
+    z-index: 11 !important;
+}
+
+.touch-device .bookmark.touch-active,
+.touch-device .bookmark:focus {
+    z-index: 9999 !important;
+}
+
+.touch-device .bookmark-text {
+    position: relative !important;
+    z-index: 10001 !important;
+}
+
+.touch-device .bookmark-icon {
+    position: relative !important;
+    z-index: 10000 !important;
+}
+
+.touch-device .coming-soon-badge {
+    position: absolute !important;
+    z-index: 10002 !important;
+    pointer-events: none !important;
+}
+
+/* ===== 書籤文字在觸摸設備上的特殊處理 ===== */
+.touch-device .bookmark-text {
+    /* 預設隱藏，只有在激活時顯示 */
+    opacity: 0 !important;
+    transform: translateX(-20px) !important;
+    pointer-events: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.touch-device .bookmark.touch-active .bookmark-text,
+.touch-device .bookmark:focus .bookmark-text {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    pointer-events: auto !important;
+}
+
+/* ===== 書籤圖標在觸摸設備上始終可見 ===== */
+.touch-device .bookmark-icon {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    pointer-events: auto !important;
+}
+
+.touch-device .bookmark.touch-active .bookmark-icon,
+.touch-device .bookmark:focus .bookmark-icon {
+    transform: scale(1.1) !important;
+}
+
+/* ===== 防止在觸摸設備上的意外交互 ===== */
+.touch-device .book-decoration,
+.touch-device .corner-ornament,
+.touch-device .golden-line {
+    pointer-events: none !important;
+}
+
+/* ===== 觸摸設備上的載入動畫優化 ===== */
+.touch-device .loading-indicator {
+    /* 確保載入指示器在觸摸設備上可見 */
+    z-index: 10000 !important;
+}
+
+/* ===== 確保在所有觸摸設備上都能正常工作 ===== */
+@supports (touch-action: manipulation) {
+    .touch-device {
+        touch-action: manipulation !important;
+    }
+}
+
+/* ===== 為不支援 hover 的設備提供替代方案 ===== */
+@media (hover: none) {
+    .bookmark:hover {
+        /* 在無法懸停的設備上移除懸停效果 */
+        transform: translateX(0) !important;
+        opacity: 0.8 !important;
+    }
+    
+    .bookmark:hover .bookmark-text {
+        opacity: 0 !important;
+        transform: translateX(-20px) !important;
+        pointer-events: none !important;
+    }
+    
+    /* 只有在激活狀態下才顯示 */
+    .bookmark.touch-active,
+    .bookmark:active {
+        transform: translateX(35px) !important;
+        opacity: 1 !important;
+        z-index: 9999 !important;
+    }
+    
+    .bookmark.touch-active .bookmark-text,
+    .bookmark:active .bookmark-text {
+        opacity: 1 !important;
+        transform: translateX(0) !important;
+        pointer-events: auto !important;
+    }
+}
+
+/* ===== 最終的保險措施 ===== */
+.bookmark,
+.bookmark-tab,
+.bookmark-icon {
+    /* 確保這些元素始終可以接收指針事件 */
+    pointer-events: auto !important;
+}
+
+.bookmark-text {
+    /* 只有在需要時才啟用指針事件 */
+    pointer-events: var(--text-pointer-events, none) !important;
+}
+
+.touch-device .bookmark.touch-active .bookmark-text,
+.touch-device .bookmark:focus .bookmark-text {
+    --text-pointer-events: auto;
+}
