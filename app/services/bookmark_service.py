@@ -42,8 +42,9 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             icon="🎞️",
             color="#FF6B6B",
             route="memory.index",
-            description=memory_description,
-            date="2024.06"
+            description="",
+            #description=memory_description,
+            date="隨時隨地"
         ),
         BookmarkConfig(
             id="birthday",
@@ -51,9 +52,10 @@ def get_all_bookmarks() -> List[BookmarkConfig]:
             icon="🎂",
             color="#4ECDC4", 
             route="birthday.index",  # 🎂 修正路由名稱
-            description=birthday_description,
+            description="",
+            #description=birthday_description,
             enabled=True,  # 🎂 啟用生日功能
-            date="xxxx.06.26"
+            date="06.26/01.01"
         ),
         BookmarkConfig(
             id="anniversary",

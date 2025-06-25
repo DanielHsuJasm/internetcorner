@@ -666,6 +666,11 @@ main {
     opacity: 0.8;
 }
 
+.letter-content .signature p {
+    /* 🔧 確保署名段落也置中 */
+    text-align: center;
+}
+
 .close-hint {
     position: absolute;
     top: 15px;
@@ -673,6 +678,8 @@ main {
     color: #7f8c8d;
     font-size: 0.9rem;
     animation: pulse 2s infinite;
+    /* 🔧 關閉提示保持右上角位置，不受置中影響 */
+    text-align: right;
 }
 
 @keyframes pulse {

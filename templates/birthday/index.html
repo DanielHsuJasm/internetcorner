@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生日回憶 - 每一年的美好時光</title>
+    <title>生日回憶</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/birthday.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,7 @@
     </div>
 
     <header>
-        <h1>🎂 生日回憶 🎂</h1>
+        <h1>🎂 生日快樂 🎂</h1>
         <p class="header-subtitle">珍藏每一年的生日時光</p>
         
         <!-- 統計資訊 -->
@@ -68,7 +68,7 @@
         <section class="upload-section">
             <div class="upload-intro">
                 <h2>📸 上傳生日照片</h2>
-                <p>記錄每年的生日時光，讓回憶永遠綻放</p>
+                <p>記錄每年的生日時光!讓我們一起度過未來的每一年</p>
             </div>
             
             <form id="upload-form" action="{{ url_for('birthday.upload') }}" method="post" enctype="multipart/form-data">
@@ -114,7 +114,7 @@
                     <div class="form-group full-width">
                         <label for="description">照片描述 (可選)</label>
                         <input type="text" id="description" name="description" 
-                               placeholder="例如: 與家人一起的生日聚會">
+                               placeholder="例如: 與丹丹漢堡🍔一起吃得生日蛋糕">
                     </div>
                 </div>
                 
@@ -149,7 +149,7 @@
                 <div class="no-photo">
                     <div class="no-photo-icon">🎂</div>
                     <h3>還沒有生日照片</h3>
-                    <p>上傳你的第一張生日照片，開始記錄美好時光！</p>
+                    <p>上傳你的第一張生日照片！讓我們一起努力走向未來每一年</p>
                 </div>
             {% else %}
                 <div class="birthday-gallery">
@@ -211,13 +211,14 @@
         <div class="birthday-message">
             <div class="close-hint">點擊任意處關閉 ✕</div>
             <h3>🎉 生日快樂！</h3>
-            <p>願每一年的生日都充滿歡聲笑語，</p>
-            <p>願每一個願望都能實現，</p>
-            <p>願每一張照片都記錄著最美好的瞬間。</p>
-            <p>讓我們一起珍藏這些珍貴的回憶，</p>
-            <p>讓愛與溫暖永遠陪伴著你！</p>
+            <p>寶寶20歲生日快樂!我是個嘴很笨很笨的人我也不知道有甚麼可以說</p>
+            <p>但是我相信你能夠透過我的行為看到我是真的愛你，也是真的想跟你走到未來每一刻的</p>
+            <p>我做這個網站給你是因為我們一開始就是在網路上認識，也會遠距離個好幾年才有辦法見面</p>
+            <p>所以我才想在網路上留下屬於我們的一個小角落，讓我們能夠好好的紀錄我們遠距離戀愛一路上的這些甜蜜時刻</p>
+            <p>在這邊祝福你20歲生日快樂!然後我會一直一直陪著你的</p>
+            <p>愛妳喔!我的寶</p>
             <div class="signature">
-                <p>— 來自生日回憶的溫暖祝福 🎈</p>
+                <p>— 來自丹丹漢堡🍔的生日祝福 🎈</p>
             </div>
         </div>
     </div>
