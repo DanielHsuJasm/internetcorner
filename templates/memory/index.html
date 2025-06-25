@@ -112,9 +112,15 @@
         </section>
     </main>
 
-    <!-- 信封元件 -->
-    <div class="envelope-container" tabindex="0" role="button" aria-label="開啟信件">
-        <div class="envelope"></div>
+    <!-- 🔧 統一信封元件 - 完全模仿生日蛋糕風格 -->
+    <div class="envelope-container" tabindex="0" role="button" aria-label="查看信件">
+        <div class="envelope">
+            <div class="envelope-front">
+                <div class="envelope-icon">💌</div>
+                <div class="envelope-text">查看信件</div>
+            </div>
+        </div>
+        
         <div class="letter-content">
             <div class="close-hint">點擊任意處關閉 ✕</div>
             <h3>💌 致親愛的你</h3>
@@ -141,79 +147,12 @@
         </div>
     </div>
 
+    <!-- JavaScript -->
     <!-- 信件功能腳本 (需要最先載入) -->
     <script src="{{ url_for('static', filename='js/letter.js') }}"></script>
     <!-- 主行為腳本 -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <!-- 星空 Canvas 背景腳本 -->
     <script src="{{ url_for('static', filename='js/star-background.js') }}"></script>
-
-    <style>
-    /* 返回首頁按鈕樣式 */
-    .back-to-home {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 1000;
-    }
-
-    .back-button {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 20px;
-        background: rgba(0, 0, 0, 0.7);
-        color: #FFD700;
-        text-decoration: none;
-        border-radius: 25px;
-        border: 1px solid rgba(255, 215, 0, 0.3);
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        font-family: 'Noto Sans TC', sans-serif;
-        font-weight: 500;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .back-button:hover {
-        background: rgba(255, 215, 0, 0.1);
-        border-color: rgba(255, 215, 0, 0.6);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.2);
-    }
-
-    .back-icon {
-        font-size: 1.2rem;
-        transition: transform 0.3s ease;
-    }
-
-    .back-button:hover .back-icon {
-        transform: scale(1.1);
-    }
-
-    .back-text {
-        font-size: 0.9rem;
-    }
-
-    /* 響應式 */
-    @media (max-width: 768px) {
-        .back-to-home {
-            top: 15px;
-            left: 15px;
-        }
-        
-        .back-button {
-            padding: 10px 16px;
-            gap: 6px;
-        }
-        
-        .back-icon {
-            font-size: 1rem;
-        }
-        
-        .back-text {
-            font-size: 0.8rem;
-        }
-    }
-    </style>
 </body>
 </html>
