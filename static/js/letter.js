@@ -1,4 +1,4 @@
-// ===== 🔧 統一信封系統 - 模仿生日蛋糕的完整功能 =====
+// ===== 🔧 統一信封系統 - 修復置中問題 =====
 
 class LetterManager {
     constructor() {
@@ -34,6 +34,9 @@ class LetterManager {
             return;
         }
 
+        // 🔧 修復置中問題 - 設置正確的樣式
+        this.fixCenteringStyles();
+
         // 預先優化元素
         this.optimizeElements();
 
@@ -43,7 +46,60 @@ class LetterManager {
         // 綁定事件監聽器
         this.bindEvents();
 
-        console.log('💌 信件功能已初始化 (統一蛋糕風格)');
+        console.log('💌 信件功能已初始化 (置中修復版)');
+    }
+
+    /**
+     * 🔧 修復置中問題 - 設置正確的CSS樣式
+     */
+    fixCenteringStyles() {
+        // 確保信件內容有正確的置中樣式
+        this.letterContent.style.position = 'fixed';
+        this.letterContent.style.top = '50%';
+        this.letterContent.style.left = '50%';
+        this.letterContent.style.transform = 'translate(-50%, -50%)';
+        this.letterContent.style.zIndex = '10001';
+        
+        // 設置適當的尺寸和邊距
+        this.letterContent.style.width = '90%';
+        this.letterContent.style.maxWidth = '600px';
+        this.letterContent.style.maxHeight = '80vh';
+        this.letterContent.style.overflow = 'auto';
+        
+        // 確保背景和邊框樣式
+        this.letterContent.style.background = 'rgba(255, 255, 255, 0.98)';
+        this.letterContent.style.borderRadius = '15px';
+        this.letterContent.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.5)';
+        this.letterContent.style.border = '3px solid #d4af37';
+        this.letterContent.style.padding = '40px';
+        this.letterContent.style.fontFamily = "'Noto Sans TC', serif";
+        this.letterContent.style.color = '#333';
+        this.letterContent.style.lineHeight = '1.8';
+        this.letterContent.style.textAlign = 'center';
+        
+        // 響應式調整
+        const updateResponsiveStyles = () => {
+            if (window.innerWidth <= 768) {
+                this.letterContent.style.width = '95%';
+                this.letterContent.style.padding = '25px';
+                this.letterContent.style.maxHeight = '85vh';
+            } else {
+                this.letterContent.style.width = '90%';
+                this.letterContent.style.padding = '40px';
+                this.letterContent.style.maxHeight = '80vh';
+            }
+        };
+        
+        // 初始設置
+        updateResponsiveStyles();
+        
+        // 監聽視窗大小變化
+        window.addEventListener('resize', updateResponsiveStyles);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateResponsiveStyles, 300);
+        });
+
+        console.log('🔧 信件置中樣式已修復');
     }
 
     /**
@@ -56,7 +112,7 @@ class LetterManager {
         
         // 設置初始 transform，啟用 GPU 加速
         this.envelopeContainer.style.transform = 'translateZ(0)';
-        this.letterContent.style.transform = 'translateZ(0)';
+        this.letterContent.style.transform = 'translate(-50%, -50%) translateZ(0)';
         
         // 優化渲染
         this.envelopeContainer.style.backfaceVisibility = 'hidden';
@@ -122,7 +178,7 @@ class LetterManager {
     }
 
     /**
-     * 🔧 開啟信件 - 模仿蛋糕開啟動畫
+     * 🔧 開啟信件 - 修復置中問題
      */
     openLetter() {
         if (this.isFullscreen || this.isAnimating) return;
@@ -144,17 +200,65 @@ class LetterManager {
         // 立即應用全螢幕樣式
         this.envelopeContainer.classList.add('fullscreen');
 
+        // 🔧 強制重新計算置中位置
+        this.recenterLetter();
+
         // 等待動畫完成後顯示信件內容
         setTimeout(() => {
             this.letterContent.classList.add('show');
+            this.letterContent.style.opacity = '1';
+            this.letterContent.style.visibility = 'visible';
+            
+            // 🔧 再次確保置中
+            this.recenterLetter();
+            
             this.focusLetter();
             this.isAnimating = false;
             
-            console.log('💌 信件已開啟');
+            console.log('💌 信件已開啟且置中');
         }, this.animationDuration);
 
         // 觸發自定義事件
         this.dispatchCustomEvent('letter:opened');
+    }
+
+    /**
+     * 🔧 重新計算並確保信件置中
+     */
+    recenterLetter() {
+        if (!this.letterContent) return;
+
+        // 強制重新計算位置
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // 設置固定定位
+        this.letterContent.style.position = 'fixed';
+        this.letterContent.style.top = '50%';
+        this.letterContent.style.left = '50%';
+        this.letterContent.style.transform = 'translate(-50%, -50%)';
+        this.letterContent.style.zIndex = '10001';
+        
+        // 響應式尺寸調整
+        if (viewportWidth <= 768) {
+            this.letterContent.style.width = '95%';
+            this.letterContent.style.maxWidth = '95vw';
+            this.letterContent.style.padding = '25px';
+            this.letterContent.style.fontSize = '1rem';
+        } else {
+            this.letterContent.style.width = '90%';
+            this.letterContent.style.maxWidth = '600px';
+            this.letterContent.style.padding = '40px';
+            this.letterContent.style.fontSize = '1.1rem';
+        }
+        
+        // 高度限制
+        this.letterContent.style.maxHeight = viewportHeight <= 600 ? '90vh' : '80vh';
+        
+        console.log('🔧 信件已重新置中', {
+            viewport: `${viewportWidth}x${viewportHeight}`,
+            letterSize: `${this.letterContent.offsetWidth}x${this.letterContent.offsetHeight}`
+        });
     }
 
     /**
@@ -170,6 +274,8 @@ class LetterManager {
 
         // 隱藏信件內容
         this.letterContent.classList.remove('show');
+        this.letterContent.style.opacity = '0';
+        this.letterContent.style.visibility = 'hidden';
 
         setTimeout(() => {
             // 恢復頁面滾動
@@ -336,6 +442,9 @@ class LetterManager {
 
         // 一次性更新 DOM
         this.letterContent.innerHTML = tempContainer.innerHTML;
+        
+        // 重新應用置中樣式
+        this.fixCenteringStyles();
     }
 
     /**
@@ -440,6 +549,14 @@ window.toggleLetter = function() {
     }
 };
 
+// 🔧 全域函數：重新置中信件
+window.recenterLetter = function() {
+    if (letterManager && letterManager.isFullscreen) {
+        letterManager.recenterLetter();
+        console.log('💌 信件已手動重新置中');
+    }
+};
+
 // ===== 🔧 事件監聽和集成 - 模仿生日系統 =====
 
 // 性能檢測和自動優化
@@ -477,12 +594,23 @@ document.addEventListener('visibilitychange', function() {
 // 🔧 方向變化處理（模仿生日系統）
 window.addEventListener('orientationchange', function() {
     if (letterManager && letterManager.isFullscreen) {
-        // 方向變化時重新調整
+        // 方向變化時重新調整置中
         setTimeout(() => {
-            if (letterManager.letterContent) {
-                letterManager.letterContent.style.maxHeight = '80vh';
-            }
+            letterManager.recenterLetter();
+            console.log('📱 方向變化：信件已重新置中');
         }, 300);
+    }
+});
+
+// 🔧 視窗大小變化處理
+window.addEventListener('resize', function() {
+    if (letterManager && letterManager.isFullscreen) {
+        // 延遲重新置中以避免頻繁調用
+        clearTimeout(letterManager._resizeTimeout);
+        letterManager._resizeTimeout = setTimeout(() => {
+            letterManager.recenterLetter();
+            console.log('🖥️ 視窗大小變化：信件已重新置中');
+        }, 150);
     }
 });
 
@@ -569,13 +697,14 @@ window.updateLetterContent = function(title, content, signature) {
     return false;
 };
 
-console.log('💌 統一信件功能已載入！(完全模仿生日蛋糕風格)');
+console.log('💌 統一信件功能已載入！(置中修復版)');
 console.log('🎮 可用指令:');
 console.log('  openLetter() - 開啟信件');
 console.log('  closeLetter() - 關閉信件');
 console.log('  toggleLetter() - 切換信件狀態');
+console.log('  recenterLetter() - 重新置中信件');
 console.log('  getLetterStatus() - 查看信件狀態');
 console.log('  reinitializeLetter() - 重新初始化');
 console.log('  enableLetterPerformanceMode() - 啟用性能模式');
 console.log('  updateLetterContent(title, content, signature) - 更新內容');
-console.log('  🌟 現在與生日蛋糕功能完全一致！');
+console.log('  🌟 現在信件會正確在螢幕中間置中！');
