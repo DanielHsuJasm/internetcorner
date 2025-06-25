@@ -612,6 +612,7 @@ main {
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 
+/* ===== 🔧 修改：信件內容置中對齊 ===== */
 .letter-content {
     position: absolute;
     top: 50%;
@@ -631,6 +632,7 @@ main {
     font-family: 'Noto Sans TC', serif;
     color: #333;
     line-height: 1.8;
+    /* 🔧 修改：將文字對齊改為置中 */
     text-align: center;
     border: 3px solid #d4af37;
     will-change: transform, opacity;
@@ -645,15 +647,19 @@ main {
     color: #2c3e50;
     margin-bottom: 20px;
     font-size: 1.5rem;
+    /* 🔧 確保標題置中 */
     text-align: center;
 }
 
 .letter-content p {
     margin-bottom: 15px;
     font-size: 1.1rem;
+    /* 🔧 確保段落置中 */
+    text-align: center;
 }
 
 .letter-content .signature {
+    /* 🔧 確保署名置中 */
     text-align: center;
     margin-top: 30px;
     font-style: italic;
